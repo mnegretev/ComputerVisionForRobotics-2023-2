@@ -57,7 +57,7 @@ Y una GUI como la siguiente:
 ## Máquina virtual
 
 Se puede descargar una máquina virtual para [VirtualBox](https://www.virtualbox.org/wiki/Downloads) con Ubuntu, ROS y Webots ya instalados de [esta dirección.](https://drive.google.com/drive/folders/185jFqv_20o3U70ESKVnhUv1zi7AG2F7u?usp=share_link) <br>
-Solo descomprima el archivo y siga las instrucciones del video que se encuentra en la misma carpeta. 
+Solo descomprima el archivo y siga las instrucciones del video que se encuentra en la misma carpeta. La máquina virtual ya tiene todo instalado por lo que se puede pasar a la sección de pruebas. 
 
 Se recomienda configurar la máquina virtual con 4 CPUs y 4GB de RAM.
 Usuario: cv <br>
