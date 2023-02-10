@@ -29,15 +29,15 @@ Este respositorio contiene simulaciones para un robot de servicio doméstico y p
 
 Si todo se instaló y compiló correctamente, se debería ver un visualizador como el siguiente:
 
-<img src="https://github.com/mnegretev/Mobile-Robots-2023-1/blob/master/Media/rviz.png" alt="RViz" width="720"/>
+<img src="https://github.com/mnegretev/ComputerVisionForRobotics-2023-2/blob/master/Media/rviz.png" alt="RViz" width="720"/>
 
 Un ambiente simulado como el siguiente:
 
-<img src="https://github.com/mnegretev/Mobile-Robots-2023-1/blob/master/Media/gazebo.png" alt="Gazebo" width="764"/>
+<img src="https://github.com/mnegretev/ComputerVisionForRobotics-2023-2/blob/master/Media/gazebo.png" alt="Gazebo" width="764"/>
 
 Y una GUI como la siguiente:
 
-<img src="https://github.com/mnegretev/Mobile-Robots-2023-1/blob/master/Media/gui.png" alt="GUI" width="339"/>
+<img src="https://github.com/mnegretev/ComputerVisionForRobotics-2023-2/blob/master/Media/gui.png" alt="GUI" width="339"/>
 
 Para correr la simulación del vehículo sin conductor, ejecute lo siguiente:
 
@@ -47,11 +47,11 @@ Para correr la simulación del vehículo sin conductor, ejecute lo siguiente:
 
 Si todo se instaló y compiló correctamente, se debería ver un ambiente simulado como el siguiente:
 
-<img src="https://github.com/mnegretev/Mobile-Robots-2023-1/blob/master/Media/webots.png" alt="Webots" width="764"/>
+<img src="https://github.com/mnegretev/ComputerVisionForRobotics-2023-2/blob/master/Media/webots.png" alt="Webots" width="764"/>
 
 Y una GUI como la siguiente:
 
-<img src="https://github.com/mnegretev/Mobile-Robots-2023-1/blob/master/Media/webots_gui.png" alt="GUI" width="375"/>
+<img src="https://github.com/mnegretev/ComputerVisionForRobotics-2023-2/blob/master/Media/webots_gui.png" alt="GUI" width="375"/>
 
 
 ## Máquina virtual
