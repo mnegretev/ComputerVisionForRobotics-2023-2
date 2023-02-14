@@ -20,11 +20,16 @@ def trackbar_callback(val):
 def main():
     global img_baboon, img_copy, circle_radius
     img_baboon = cv2.imread('baboon.jpg')
-    img_copy   = img_baboon.copy()
+    img_copy   = img_baboon.copy() #Si se ejecuta imig_copy=img_baboon
+    #En ese caso se copia la referencia del apuntador
+    #Usando .copy() se puede crear una copia real de cada pixel
+    #De forma que al modificar la copia no se altera el original
     circle_radius = 10
     cv2.namedWindow('Baboon')
-    cv2.setMouseCallback('Baboon', mouse_callback)
+    cv2.setMouseCallback('Baboon', mouse_callback) #captura el mouse
+    #Dispara la función
     cv2.createTrackbar('r','Baboon',circle_radius, 100, trackbar_callback)
+    #circle_radius es la varibale que guarda el valor de la barra
     while True:
         cv2.imshow("Baboon", img_copy)
         if cv2.waitKey(100) & 0xFF == 27:

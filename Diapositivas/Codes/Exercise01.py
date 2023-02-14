@@ -9,7 +9,9 @@ def main():
     cv2.imshow("BGR Image", img_baboon)
     cv2.imshow("Blank image", img_blank)
     cv2.imshow("Region of Interest", img_roi)
-    cv2.waitKey(0)
+    cv2.waitKey(0) #Importante,
+    #espera una tecla del usuario por cierto tiempo
+    #En este caso al escribir 0 espera un tiempo infinito
 
 if __name__ == '__main__':
     main()
