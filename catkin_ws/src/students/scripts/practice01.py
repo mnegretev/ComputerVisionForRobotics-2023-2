@@ -5,6 +5,7 @@
 
 import cv2
 import numpy as np
+from pathlib import Path
 
 def mouse_callback(event, x, y, flags, param):
     global frame, frame_copy, circle_radius, x1,y1,x2,y2,show,crop
@@ -29,24 +30,44 @@ def trackbar_callback(val):
     tolerance = val
 
 def Change_background():
-    global frame_copy, background, tolerance
+    global frame_copy, background, tolerance, y1,y2,x1,x2
+    if y2<y1:
+        temp=y1
+        y1=y2
+        y2=temp
+    if x2<x1:
+        temp=x1
+        x1=x2
+        x2=temp
+
     cropImg = frame_copy[y1:y2, x1:x2]
+    cropHSV=cv2.cvtColor(cropImg, cv2.COLOR_BGR2HSV)
+
     frame_hsv=cv2.cvtColor(frame_copy, cv2.COLOR_BGR2HSV)
     rgb_mean = cv2.mean(cropImg)
+    hsv_mean = cv2.mean(cropHSV)
 
     upper_rgb = (rgb_mean[0]+tolerance, rgb_mean[1]+tolerance, rgb_mean[2]+tolerance)
     lower_rgb = (rgb_mean[0]-tolerance, rgb_mean[1]-tolerance, rgb_mean[2]-tolerance)
 
-    u = np.uint8([[[rgb_mean[0]+tolerance, rgb_mean[1]+tolerance, rgb_mean[2]+tolerance]]])
-    up=cv2.cvtColor(u, cv2.COLOR_BGR2HSV)
-    l = np.uint8([[[rgb_mean[0]-tolerance, rgb_mean[1]-tolerance, rgb_mean[2]-tolerance]]])
-    lo=cv2.cvtColor(l, cv2.COLOR_BGR2HSV)
-    u=(float(up[0][0][0])+4, max(float(lo[0][0][1]),float(up[0][0][1])),max(float(lo[0][0][2]),float(up[0][0][2])))
-    l=(float(lo[0][0][0])+4, min(float(lo[0][0][1]),float(up[0][0][1])),min(float(lo[0][0][2]),float(up[0][0][2])))
+    upper_hsv = (hsv_mean[0]+1+tolerance*7/150, hsv_mean[1]+tolerance*70/150, hsv_mean[2]+tolerance*210/150)
+    lower_hsv = (hsv_mean[0]-1-tolerance*7/150, hsv_mean[1]-tolerance*70/150, hsv_mean[2]-tolerance*210/150)
 
-    print(l, u)
-    Mask_background=cv2.inRange(frame_hsv, l, u)
-    cv2.imshow('Mask', Mask_background)
+    back_b,back_g,back_r = cv2.split(background)
+
+    Mask_background=cv2.inRange(frame_hsv, lower_hsv, upper_hsv)
+    Mask_video=cv2.bitwise_not(Mask_background)
+    b,g,r = cv2.split(frame_copy)
+    video_r = cv2.bitwise_and(Mask_video, r)
+    video_g = cv2.bitwise_and(Mask_video, g)
+    video_b = cv2.bitwise_and(Mask_video, b)
+    back_r = cv2.bitwise_and(Mask_background, back_r)
+    back_g = cv2.bitwise_and(Mask_background, back_g)
+    back_b = cv2.bitwise_and(Mask_background, back_b)
+    img_back = cv2.merge((back_b,back_g,back_r))
+    img_video = cv2.merge((video_b,video_g,video_r))
+    img_processing = cv2.bitwise_or(img_back, img_video)
+    cv2.imshow('HSV Background', img_processing)
 
     Mask_background=cv2.inRange(frame_copy, lower_rgb, upper_rgb)
     Mask_video=cv2.bitwise_not(Mask_background)
@@ -54,13 +75,13 @@ def Change_background():
     video_r = cv2.bitwise_and(Mask_video, r)
     video_g = cv2.bitwise_and(Mask_video, g)
     video_b = cv2.bitwise_and(Mask_video, b)
-    back_r = cv2.bitwise_and(Mask_background, background)
-    back_g = cv2.bitwise_and(Mask_background, background)
-    back_b = cv2.bitwise_and(Mask_background, background)
+    back_r = cv2.bitwise_and(Mask_background, back_r)
+    back_g = cv2.bitwise_and(Mask_background, back_g)
+    back_b = cv2.bitwise_and(Mask_background, back_b)
     img_back = cv2.merge((back_b,back_g,back_r))
     img_video = cv2.merge((video_b,video_g,video_r))
     img_processing = cv2.bitwise_or(img_back, img_video)
-    cv2.imshow('New Background', img_processing)
+    cv2.imshow('RGB Background', img_processing)
 
 
 def main():
@@ -69,7 +90,8 @@ def main():
     show,crop=False,False
     x1,y1,x2,y2=0,0,0,0
     tolerance = 10
-    background = 100*np.ones((480,640), np.uint8)
+    home_path = str(Path.home())
+    background = cv2.imread(home_path+'/ComputerVisionForRobotics-2023-2/Media/background.jpg') #100*np.ones((480,640), np.uint8)
     cap  = cv2.VideoCapture(0) #Default resolution 1920x1080
     cap.set(3, 640) #Change the camera resolution to 640x480
     cap.set(4, 480)
