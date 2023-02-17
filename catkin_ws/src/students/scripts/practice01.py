@@ -82,8 +82,6 @@ def Change_background():
     img_back = cv2.merge((back_b2,back_g2,back_r2))
     img_video = cv2.merge((video_b,video_g,video_r))
     img_processing = cv2.bitwise_or(img_back, img_video)
-    cv2.imshow('Maskback', Mask_background)
-    cv2.imshow('Maskvideo', Mask_video)
     cv2.imshow('RGB Background', img_processing)
 
 
