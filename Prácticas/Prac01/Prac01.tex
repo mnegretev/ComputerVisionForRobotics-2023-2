@@ -1,0 +1,109 @@
+\documentclass[letterpaper,11pt]{article}
+\usepackage[spanish]{babel}
+\spanishdecimal{.}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[top=2.5cm, bottom=3cm, left=2.5cm, right=3cm]{geometry}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\usepackage[natbibapa]{apacite}
+\usepackage{multicol}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\bibliographystyle{apacite}
+
+\definecolor{graywhite}{rgb}{0.9529,0.9607,0.9686}
+\definecolor{bluegray}{rgb}{0.6823, 0.7411, 0.8}
+\definecolor{darkred}{rgb}{0.7372, 0.2392, 0.2392}
+\definecolor{bluedark}{rgb}{0.294, 0.4705, 0.6407}
+\definecolor{darkgreen}{rgb}{0.1764, 0.5294, 0.0901}
+\lstset{
+  backgroundcolor=\color{graywhite},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{darkgreen},    % comment style
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{darkred},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=7pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{bluedark}, % the style that is used for the line-numbers
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{bluedark},     % string literal style
+  frame=single,
+  rulecolor=\color{bluegray},
+  tabsize=2,                   % sets default tabsize to 2 spaces
+  xleftmargin=1cm,
+  xrightmargin=0.5cm,
+  framexleftmargin=0.5cm,
+  extendedchars=true,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1,
+}
+
+
+\title{Práctica 01\\La biblioteca OpenCV}
+\author{Visión Computacional Aplicada a la Robótica}
+\date{Maestría en Ingeniería, UNAM, 2023-2}
+\begin{document}
+\renewcommand{\tablename}{Tabla}
+
+\maketitle
+
+\subsection*{Resumen}
+El alumno realizará un programa para agregar un background virtual al video obtenido de una cámara web. 
+
+\subsection*{Objetivos}
+\begin{itemize}
+\item Aprender a abrir imágenes y flujos de video mediante la biblioteca OpenCV
+\item Aprender a manipular las estructuras de datos utilizadas por Numpy y OpenCV
+\item Familiarizarse con el uso de las herramientas de interfaz gráfica de OpenCV
+\end{itemize}
+
+\section*{Duración}
+1 semana
+
+\section*{Desarrollo}
+Escriba un programa en Python que realice lo siguiente:
+\begin{enumerate}
+\item Abrir una WebCam y mostrar el video en una ventana.
+\item Capturar con el cursor del mouse un \textit{bounding box}, de modo que el usuario pueda seleccionar una región de interés en la imagen utilizando el mouse.
+\item Determinar el promedio de color $\bar{x}$ de los pixeles dentro del \textit{bounding box}
+\item Agregar un \textit{track bar} a la ventana de video con la que el usuario pueda seleccionar una tolerancia $\Delta x$
+\item Determinar el conjunto de pixeles $P$ cuyo color esté en el intervalo $\bar{x} \pm \Delta x$
+\item Sustituir todos los pixeles $P$ del video por los correspondientes de una imagen \textit{background} (el alumno puede usar la imagen que desee)
+\item Mostrar el video resultante en otra ventana.
+\end{enumerate}
+
+
+
+\subsubsection*{Funciones de referencia}
+Se pueden utilizar las siguientes funciones de OpenCV (son funciones sugeridas, utilice las que considere convenientes):
+\begin{multicols}{3}
+  \begin{itemize}
+  \item cv2.imread
+  \item cv2.bitwise\_and
+  \item cv2.bitwise\_or 
+  \item cv2.bitwise\_not
+  \item cv2.bitwise\_xor
+  \item cv2.inRange
+  \item cv2.merge
+  \item cv2.split
+  \item cv2.imshow
+  \item cv2.VideoCapture
+  \item cv2.mean
+  \end{itemize}
+\end{multicols}
+
+\section*{Entregables:}
+\begin{itemize}
+\item Subir el código fuente al repositorio en la rama correspondiente.
+\item Sobreescriba el archivo que se encuentra en la ruta \texttt{catkin\_ws/src/students/scripts/practice01.py}
+\end{itemize}
+\end{document}
