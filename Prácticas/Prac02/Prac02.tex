@@ -1,0 +1,102 @@
+\documentclass[letterpaper,11pt]{article}
+\usepackage[spanish]{babel}
+\spanishdecimal{.}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[top=2.5cm, bottom=3cm, left=2.5cm, right=3cm]{geometry}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\usepackage[natbibapa]{apacite}
+\usepackage{multicol}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\bibliographystyle{apacite}
+
+\definecolor{graywhite}{rgb}{0.9529,0.9607,0.9686}
+\definecolor{bluegray}{rgb}{0.6823, 0.7411, 0.8}
+\definecolor{darkred}{rgb}{0.7372, 0.2392, 0.2392}
+\definecolor{bluedark}{rgb}{0.294, 0.4705, 0.6407}
+\definecolor{darkgreen}{rgb}{0.1764, 0.5294, 0.0901}
+\lstset{
+  backgroundcolor=\color{graywhite},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{darkgreen},    % comment style
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{darkred},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=7pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{bluedark}, % the style that is used for the line-numbers
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{bluedark},     % string literal style
+  frame=single,
+  rulecolor=\color{bluegray},
+  tabsize=2,                   % sets default tabsize to 2 spaces
+  xleftmargin=1cm,
+  xrightmargin=0.5cm,
+  framexleftmargin=0.5cm,
+  extendedchars=true,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1,
+}
+
+
+\title{Práctica 02\\Detección de Bordes}
+\author{Visión Computacional Aplicada a la Robótica}
+\date{UNAM, 2023-2}
+\begin{document}
+\renewcommand{\tablename}{Tabla}
+
+\maketitle
+
+\subsection*{Resumen}
+El alumno aprenderá a aplicar convoluciones para realizar diferentes operaciones como el filtrado gaussiano, obtención de gradiente y detección de bordes. 
+
+
+\subsection*{Objetivos}
+\begin{itemize}
+\item Aprender a utilizar las funciones de convolución de OpenCV
+\item Aplicar el filtro de Sobel para cálculo de gradientes
+\item Implementar el detector de bordes de Canny
+\end{itemize}
+
+\section*{Duración}
+1 semana
+
+\section*{Desarrollo}
+Programe en Python o C++ los siguientes algoritmos:
+
+\begin{enumerate}
+\item Convolución 2D de dos señales bidimensionales. Puede utilizar la función de OpenCV \texttt{cv.filter2D}
+\item Filtro Gaussiano
+\item Filtro de Sobel horizontal.
+\item Filtro de Sobel vertical.
+\item Detector de bordes de Canny.
+\end{enumerate}
+
+\textbf{Importante:} No se permite el uso de las funciones de OpenCV que ya realizan lo que se pide: cv2.Canny, cv2.GaussianBlur y cv2.Sobel. Se puede utilizar la función cv2.filter2D para las convoluciones. 
+\[\]
+Para el desarrollo del detector de bordes de Canny se pueden seguir los pasos explicados en \url{https://docs.opencv.org/3.4/da/d5c/tutorial_canny_detector.html} o \url{https://en.wikipedia.org/wiki/Canny_edge_detector}, los cuales consisten, a grandes rasgos, en los siguientes pasos:
+
+\begin{itemize}
+\item Filtrado Gaussiano de la imagen
+\item Obtención de gradientes
+\item Supresión de puntos no máximos
+\item Aplicación de histéresis
+\end{itemize}
+
+Se puede utilizar el archivo \texttt{example\_canny.py} como referencia. Realice varias pruebas variando las diferentes constantes de sintonización: ancho del filtro Gaussiano, umbral superior e umbral inferior del detector de bordes. Reporte los resultados obtenidos. 
+
+\section*{Entregables:}
+\begin{itemize}
+\item Código fuente en la rama correspondiente. Sobreescriba el archivo que se encuentra en la ruta \texttt{catkin\_ws/src/students/scripts/practice02.py}
+\item Reporte escrito
+\end{itemize}
+\end{document}

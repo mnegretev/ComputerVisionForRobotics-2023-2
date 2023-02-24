@@ -9,6 +9,8 @@ while cap.isOpened():
     if not ret:
         print("Can't receive frame (stream end?). Exiting ...")
         break
+    frame = cv2.resize(frame,(640,480))
+    print(frame.shape)
     cv2.imshow('My Video', frame)
     if cv2.waitKey(10) & 0xFF == 27:
         break
