@@ -1,0 +1,96 @@
+\documentclass[letterpaper,11pt]{article}
+\usepackage[spanish]{babel}
+\spanishdecimal{.}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[top=2.5cm, bottom=3cm, left=2.5cm, right=3cm]{geometry}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\usepackage[natbibapa]{apacite}
+\usepackage{multicol}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\bibliographystyle{apacite}
+
+\definecolor{graywhite}{rgb}{0.9529,0.9607,0.9686}
+\definecolor{bluegray}{rgb}{0.6823, 0.7411, 0.8}
+\definecolor{darkred}{rgb}{0.7372, 0.2392, 0.2392}
+\definecolor{bluedark}{rgb}{0.294, 0.4705, 0.6407}
+\definecolor{darkgreen}{rgb}{0.1764, 0.5294, 0.0901}
+\lstset{
+  backgroundcolor=\color{graywhite},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{darkgreen},    % comment style
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{darkred},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=7pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{bluedark}, % the style that is used for the line-numbers
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{bluedark},     % string literal style
+  frame=single,
+  rulecolor=\color{bluegray},
+  tabsize=2,                   % sets default tabsize to 2 spaces
+  xleftmargin=1cm,
+  xrightmargin=0.5cm,
+  framexleftmargin=0.5cm,
+  extendedchars=true,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1,
+}
+
+
+\title{Práctica 03\\Transformada Hough}
+\author{Visión Computacional Aplicada a la Robótica}
+\date{UNAM, 2023-2}
+\begin{document}
+\renewcommand{\tablename}{Tabla}
+
+\maketitle
+
+\subsection*{Resumen}
+El alumno implementará la Transformada Hough para detectar lineas en una imagen en imágenes generadas por una cámara RGB.
+
+
+\subsection*{Objetivos}
+\begin{itemize}
+\item Aplicar el detector de bordes de Canny de la práctica anterior. 
+\item Aplicar la Transformada Hough para detectar líneas en una imagen. 
+\end{itemize}
+
+\section*{Duración}
+2 semanas
+
+\section*{Desarrollo}
+Programe en Python o C++ los siguientes algoritmos:
+
+\begin{enumerate}
+\item Detección de bordes mediante el algoritmo de Canny (práctica 2)
+\item Detección de líneas mediante la Transformada Hough
+\end{enumerate}
+
+El programa de detección debe dibujar las rectas detectadas sobre la imagen original. El programa debe funcionar con video y no solo con imágenes de prueba. 
+
+\textbf{Importante:} No se permite el uso de las funciones de OpenCV que ya realizan lo que se pide: cv2.Canny, cv2.HoughLines y cv2.HoughLinesP. 
+\[\]
+\begin{itemize}
+\item Para el dibujado de los círculos y líneas se recomienda el uso de las funciones cv2.line y cv2.circle.
+\item Se recomienda probar el algoritmo primero con imágenes de prueba artificiales y después sintonizar constantes para detectar líneas utilizando video.
+\item Se puede utilizar como base el programa de ejemplo en C++. 
+\end{itemize}
+
+\section*{Entregables:}
+\begin{itemize}
+\item Código fuente en la rama correspondiente. 
+\item Imágenes de prueba utilizadas (si es el caso)
+\item Reporte escrito.
+\end{itemize}
+\end{document}
