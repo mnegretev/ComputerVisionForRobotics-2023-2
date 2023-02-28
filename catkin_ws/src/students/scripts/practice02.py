@@ -7,6 +7,52 @@ import cv2
 import numpy as np
 import math
 
+def threshold(G, t_1, t_2):
+    T = np.zeros(G.shape)
+    r,c = G.shape
+    for i in range(1,r-1):
+        for j in range(1,c-1):
+            if G[i,j]>t_1 and G[i,j]<=t_2:
+                T[i,j]=60
+            elif G[i,j] > t_2 :
+                T[i,j]=255
+    return T.astype(np.uint8)
+
+def final_supress(T):
+    F = np.zeros(T.shape)
+    r,c = T.shape
+    for i in range(1,r-1):
+        for j in range(1,c-1):
+            if T[i,j]==60:
+                if(T[i+1,j]==255 or T[i+1,j+1]==255 or T[i+1,j-1]==255 or T[i-1,j]==255 or T[i-1,j+1]==255 or T[i-1,j-1]==255 or T[i,j+1]==255 or T[i,j-1]==255 ):
+                    F[i,j]=255
+                else:
+                    F[i,j]=0
+            elif T[i,j]==255:
+                F[i,j]=255
+    return F.astype(np.uint8)
+
+
+def supress_non_maximum(Gm, Ga):
+    G = np.zeros(Gm.shape)
+    r,c = Gm.shape
+    for i in range(1,r-1):
+        for j in range(1,c-1):
+            if Ga[i,j] <= 22 or Ga[i,j] > 157:
+                di, dj = 0, 1
+            elif Ga[i,j] > 22 and Ga[i,j] <= 67:
+                di, dj = 1, 1
+            elif Ga[i,j] > 67 and Ga[i,j] <= 112:
+                di, dj = 1, 0
+            else:
+                di, dj = 1, -1
+            if Gm[i,j] >= Gm[i+di, j+dj] and Gm[i,j] > Gm[i-di, j-dj]:
+                G[i,j] = Gm[i,j]
+            else:
+                G[i,j] = 0
+    return G.astype(np.uint8)
+
+
 def get_sobel_x_gradient(A):
     Gx = np.asarray([[-1, 0, 1],[-2, 0, 2],[-1, 0, 1]])/8.0
     return cv2.convertScaleAbs(cv2.filter2D(A, cv2.CV_16S, Gx))
@@ -25,8 +71,23 @@ def filter_gaussian(k,sigma):
     H=H/np.sum(H)
     return H
 
+def mag_angle(A):
+    Gx = get_sobel_x_gradient(A)
+    Gy = get_sobel_y_gradient(A)
+    r,c=Gx.shape
+    Gm=np.zeros(Gx.shape)
+    Ga=np.zeros(Gx.shape)
+    for i in range(r):
+        for j in range(c):
+            Gm[i,j]=math.sqrt(Gx[i,j]**2+Gy[i,j]**2)
+            Ga[i,j]=math.atan2(Gy[i,j],Gx[i,j])
+            if Ga[i,j]<0:
+                Ga[i,j]+=math.pi
+            Ga[i,j] = int(Ga[i,j]/math.pi*180)
+    return Gm.astype(np.uint8), Ga.astype(np.uint8)
+
 def main():
-    kernel=filter_gaussian(5,1)
+    kernel=filter_gaussian(5,1.2)
     cap  = cv2.VideoCapture(0) #Default resolution 1920x1080
     cap.set(3, 640) #Change the camera resolution to 640x480
     cap.set(4, 480)
@@ -37,17 +98,18 @@ def main():
             break
         frame_copy = frame.copy()
         frame_grey = cv2.cvtColor(frame_copy, cv2.COLOR_BGR2GRAY)
+        frame_grey = cv2.resize(frame_grey, None, fx = 0.35, fy = 0.35, interpolation = cv2.INTER_CUBIC)
         frame_filter=cv2.filter2D(frame_grey, cv2.CV_16S, kernel)
         frame_filter=cv2.convertScaleAbs(frame_filter) #Convert Scale image
-        Gx = get_sobel_x_gradient(frame_filter)
-        Gy = get_sobel_y_gradient(frame_filter)
-        
-        cv2.imshow('Original', frame_copy)
-        cv2.imshow('Filter', frame_filter)
-        cv2.imshow('Sobel x', Gx)
-        cv2.imshow('Sobel y', Gy)
+        Gm, Ga=mag_angle(frame_filter)
+        G=supress_non_maximum(Gm, Ga)
+        T=threshold(G,4,7)
+        F=final_supress(T)
+        cv2.imshow("threshold",T)
+        cv2.imshow("Final cany",F)
+        cv2.imshow('Original', frame)
         #valores del 1 al 60 aprox en Gx
-        if cv2.waitKey(10) & 0xFF == 27:
+        if cv2.waitKey(30) & 0xFF == 27:
             break
     cap.release()
     cv2.destroyAllWindows()
