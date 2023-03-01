@@ -23,11 +23,8 @@ def final_supress(T):
     r,c = T.shape
     for i in range(1,r-1):
         for j in range(1,c-1):
-            if T[i,j]==60:
-                if(T[i+1,j]==255 or T[i+1,j+1]==255 or T[i+1,j-1]==255 or T[i-1,j]==255 or T[i-1,j+1]==255 or T[i-1,j-1]==255 or T[i,j+1]==255 or T[i,j-1]==255 ):
-                    F[i,j]=255
-                else:
-                    F[i,j]=0
+            if T[i,j]==60 and (T[i+1,j]==255 or T[i+1,j+1]==255 or T[i+1,j-1]==255 or T[i-1,j]==255 or T[i-1,j+1]==255 or T[i-1,j-1]==255 or T[i,j+1]==255 or T[i,j-1]==255 ):
+                F[i,j]=255
             elif T[i,j]==255:
                 F[i,j]=255
     return F.astype(np.uint8)
@@ -103,7 +100,7 @@ def main():
         frame_filter=cv2.convertScaleAbs(frame_filter) #Convert Scale image
         Gm, Ga=mag_angle(frame_filter)
         G=supress_non_maximum(Gm, Ga)
-        T=threshold(G,4,7)
+        T=threshold(G,4,11)
         F=final_supress(T)
         cv2.imshow("threshold",T)
         cv2.imshow("Final cany",F)
