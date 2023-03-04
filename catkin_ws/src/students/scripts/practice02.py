@@ -7,6 +7,21 @@ import cv2
 import numpy as np
 import math
 
+def trackbar_callback_3(val):
+    global k_size
+    k_size=val
+    return
+
+def trackbar_callback_2(val):
+    global t2
+    t2 = val
+    return
+
+def trackbar_callback_1(val):
+    global t1
+    t1 = val
+    return
+
 def threshold(G, t_1, t_2):
     T = np.zeros(G.shape)
     r,c = G.shape
@@ -84,7 +99,10 @@ def mag_angle(A):
     return Gm.astype(np.uint8), Ga.astype(np.uint8)
 
 def main():
-    kernel=filter_gaussian(5,1.2)
+    global k_size, t1, t2
+    k_size=7
+    t1=1
+    t2=4
     cap  = cv2.VideoCapture(0) #Default resolution 1920x1080
     cap.set(3, 640) #Change the camera resolution to 640x480
     cap.set(4, 480)
@@ -93,6 +111,10 @@ def main():
         if not ret:
             print("Can't receive frame (stream end?). Exiting ...")
             break
+        cv2.createTrackbar('Umbral 1','Original', t1, 10, trackbar_callback_1)
+        cv2.createTrackbar('Umbral 2','Original', t2, 20, trackbar_callback_2)
+        cv2.createTrackbar('Kernel size','Original', k_size, 20, trackbar_callback_3)
+        kernel=filter_gaussian(k_size,1.2)
         frame_copy = frame.copy()
         frame_grey = cv2.cvtColor(frame_copy, cv2.COLOR_BGR2GRAY)
         frame_grey = cv2.resize(frame_grey, None, fx = 0.35, fy = 0.35, interpolation = cv2.INTER_CUBIC)
@@ -100,7 +122,7 @@ def main():
         frame_filter=cv2.convertScaleAbs(frame_filter) #Convert Scale image
         Gm, Ga=mag_angle(frame_filter)
         G=supress_non_maximum(Gm, Ga)
-        T=threshold(G,4,11)
+        T=threshold(G, t1, t2)
         F=final_supress(T)
         cv2.imshow("threshold",T)
         cv2.imshow("Final cany",F)
