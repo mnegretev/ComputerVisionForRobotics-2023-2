@@ -38,7 +38,7 @@ cv::Mat filter_gaussian(int k,float sigma){
     //uint8_t Array=atoi(H);
     //cout<<H<<endl;
     //CV_32F  CV_8UC1
-    cv::Mat Kernel = cv::Mat(2*siz+1, 2*siz+1, CV_32FC1, &H);
+    cv::Mat Kernel = cv::Mat(2*siz+1, 2*siz+1, CV_32F, &H);
     cout<<Kernel<<endl;
     return Kernel;
 }
@@ -88,10 +88,10 @@ int main(int, char**)
         anchor = Point( -1, -1 );
         delta = 0;
         ddepth = -1;
-        cout << gray.type() << " == " << CV_8U << endl;
-        gray.convertTo(gray,CV_32FC1);
-        filter2D(gray, img_filter, ddepth , kernel, Point(-1, -1), delta, BORDER_DEFAULT );
-        img_filter.convertTo(img_filter,CV_8UC1);
+        //cout << gray.type() << " == " << CV_8U << endl;
+        //gray.convertTo(gray,CV_32FC1);
+        filter2D(gray, img_filter, -1 , kernel, cv::Point(-1, -1), delta, BORDER_DEFAULT );
+        //img_filter.convertTo(img_filter,CV_8UC1);
         //show live and wait for a key with timeout long enough to show images
         imshow("Original", frame);
         imshow("Grey",gray);
@@ -104,4 +104,5 @@ int main(int, char**)
     }
     // the camera will be deinitialized automatically in VideoCapture destructor
     return 0;
+    //https://stackoverflow.com/questions/69338519/generated-gaussian-kernel-saturates-the-image-to-white-color-with-opencv-in-c
 }
