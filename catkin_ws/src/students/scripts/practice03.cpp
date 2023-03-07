@@ -36,6 +36,18 @@ cv::Mat filter_gaussian(int k,float sigma){
     return cv::Mat(2*siz+1, 2*siz+1, CV_32F, &H).clone();
 }
 
+cv::Mat threshold(cv::Mat& G){
+    cv::Mat T=G.clone();
+    for(size_t i=1; i < G.rows-1; i++)
+        for(size_t j=1; j < G.cols-1; j++){
+            if(G.at<unsigned char>(i,j) > t1 && G.at<unsigned char>(i,j) <= t2)
+                T.at<unsigned char>(i,j)=60;
+            else if(G.at<unsigned char>(i,j) > t2)
+                T.at<unsigned char>(i,j)=255;
+        }
+    return T.clone();
+}
+
 cv::Mat get_sobel_x_gradient(cv::Mat& img){
     float Gx[3][3]={-1,0,1,-2,0,2,-1,0,1};
     cv::Mat SobelX=Mat(3, 3, CV_32F, &Gx);
@@ -76,21 +88,11 @@ cv::Mat supress_non_maximum(cv::Mat& Gm, cv::Mat& Ga){
                 di=1;
                 dj=-1;
             }
+            if(Gm.at<unsigned char>(i,j) >= Gm.at<unsigned char>(i+di,j+dj) && Gm.at<unsigned char>(i,j) > Gm.at<unsigned char>(i-di,j-dj) )
+                G.at<unsigned char>(i,j)=Gm.at<unsigned char>(i,j);
+            else
+               G.at<unsigned char>(i,j)=0;
     }
-    //for i in range(1,r-1):
-      //  for j in range(1,c-1):
-        //    if Ga[i,j] <= 22 or Ga[i,j] > 157:
-          //      di, dj = 0, 1
-          //  elif Ga[i,j] > 22 and Ga[i,j] <= 67:
-           //     di, dj = 1, 1
-          //  elif Ga[i,j] > 67 and Ga[i,j] <= 112:
-          //      di, dj = 1, 0
-         //   else:
-        //        di, dj = 1, -1
-        //    if Gm[i,j] >= Gm[i+di, j+dj] and Gm[i,j] > Gm[i-di, j-dj]:
-        //        G[i,j] = Gm[i,j]
-        //    else:
-        //        G[i,j] = 0
     return G.clone();
 }
 
@@ -112,22 +114,24 @@ void on_threshold_changed(int, void*){}
 
 int main(int, char**)
 {
-    cv::Mat frame;
-    cv::Mat Gm;
-    cv::Mat Ga;
-    cv::Mat gray;
-    cv::Mat img_filter;
+    cv::Mat frame,Gm, G,Ga,gray, img_filter,T;
+    //cv::Mat G;
+    //cv::Mat Gm;
+    //cv::Mat Ga;
+    //cv::Mat gray;
+    //cv::Mat img_filter;
     float sigma=1;
     cv::Mat kernel=filter_gaussian(k_size, sigma);
-    cout<<kernel<<endl;
+    //cout<<kernel<<endl;
     //--- INITIALIZE VIDEOCAPTURE
     VideoCapture cap;
     // open the default camera using default API
     cap.open(0);
-    cap.set(CAP_PROP_FRAME_WIDTH, 640);//Setting the width of the video
-    cap.set(CAP_PROP_FRAME_HEIGHT, 480);//Setting the height of the video//
+    cap.set(CAP_PROP_FRAME_WIDTH, 320);//Setting the width of the video
+    cap.set(CAP_PROP_FRAME_HEIGHT, 240);//Setting the height of the video//
     cv::namedWindow("Original");
     cv::createTrackbar("Umbral inferior:", "Original", &t1, 14, on_threshold_changed);
+    cv::createTrackbar("Umbral superior:", "Original", &t2, 30, on_threshold_changed);
     cv::createTrackbar("Tamaño filtro:", "Original", &k_size, 14, on_threshold_changed);
     // check if we succeeded
     if (!cap.isOpened()) {
@@ -157,14 +161,16 @@ int main(int, char**)
         Ga=img_filter.clone();
         //img_filter.convertTo(img_filter,CV_8UC1);
         mag_angle(img_filter, Gm, Ga);
-        //cv::Mat SobelX=get_sobel_x_gradient(img_filter);
-        //cv::Mat SobelY=get_sobel_y_gradient(img_filter);
+        G=supress_non_maximum(Gm, Ga);
+        T=threshold(G);
         //show live and wait for a key with timeout long enough to show images
         imshow("Original", frame);
         imshow("Grey",gray);
         //imshow("Sobel Y", SobelX);
         imshow("Magnitud", Gm);
-        imshow("Angulo", Ga);
+        //imshow("Angulo", Ga);
+        imshow("G",G);
+        imshow("T",T);
         //cout<<kernel<<endl;
         if (waitKey(30) == 27)
             break;
