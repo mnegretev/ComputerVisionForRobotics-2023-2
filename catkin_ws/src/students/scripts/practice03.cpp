@@ -42,7 +42,7 @@ cv::Mat get_sobel_x_gradient(cv::Mat& img){
     cv::Mat img_filter;
     filter2D(img, img_filter, ddepth , SobelX, cv::Point(-1, -1), delta, BORDER_DEFAULT );
     //CV_32F  CV_8UC1
-    return img_filter.clone();;
+    return img_filter.clone();
 }
 
 cv::Mat get_sobel_y_gradient(cv::Mat& img){
@@ -51,7 +51,47 @@ cv::Mat get_sobel_y_gradient(cv::Mat& img){
     cv::Mat img_filter;
     filter2D(img, img_filter, ddepth , SobelY, cv::Point(-1, -1), delta, BORDER_DEFAULT );
     //CV_32F  CV_8UC1
-    return img_filter.clone();;
+    return img_filter.clone();
+}
+
+cv::Mat supress_non_maximum(cv::Mat& Gm, cv::Mat& Ga){
+    cv::Mat G=Gm.clone();
+    size_t di=0;
+    size_t dj=0;
+    for(size_t i=1; i < G.rows-1; i++)
+        for(size_t j=1; j < G.cols-1; j++){
+            if(Ga.at<unsigned char>(i,j)<=22 || Ga.at<unsigned char>(i,j) > 157){
+                di=0;
+                dj=1;
+            }
+            else if(Ga.at<unsigned char>(i,j)>22 && Ga.at<unsigned char>(i,j) <= 67){
+                di=1;
+                dj=1;
+            }
+            else if(Ga.at<unsigned char>(i,j)>67 && Ga.at<unsigned char>(i,j) <= 112){
+                di=1;
+                dj=0;
+            }
+            else{
+                di=1;
+                dj=-1;
+            }
+    }
+    //for i in range(1,r-1):
+      //  for j in range(1,c-1):
+        //    if Ga[i,j] <= 22 or Ga[i,j] > 157:
+          //      di, dj = 0, 1
+          //  elif Ga[i,j] > 22 and Ga[i,j] <= 67:
+           //     di, dj = 1, 1
+          //  elif Ga[i,j] > 67 and Ga[i,j] <= 112:
+          //      di, dj = 1, 0
+         //   else:
+        //        di, dj = 1, -1
+        //    if Gm[i,j] >= Gm[i+di, j+dj] and Gm[i,j] > Gm[i-di, j-dj]:
+        //        G[i,j] = Gm[i,j]
+        //    else:
+        //        G[i,j] = 0
+    return G.clone();
 }
 
 void mag_angle(cv::Mat& A, cv::Mat& Gm, cv::Mat& Ga){
