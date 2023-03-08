@@ -8,9 +8,9 @@
 using namespace cv;
 using namespace std;
 
-int k_size = 3; //Variable kernel size for the gaussian filter
-int t1=1; // lower threshold
-int t2=4; // upper threshold
+int k_size = 5; //Variable kernel size for the gaussian filter
+int t1=5; // lower threshold
+int t2=10; // upper threshold
 double pi = 3.14159265358979323846;
 double delta=0;
 int ddepth=-1;
@@ -21,14 +21,14 @@ std::vector<cv::Vec2f> hough_lines(cv::Mat img_bin, float d_min, float d_max, in
 {
     int dist_n  = (int)ceil((d_max - d_min)/d_res);
     int theta_n = (int)ceil((theta_max - theta_min)/theta_res);
-    int votes[dist_n][theta_n];
+    int votes[dist_n][theta_n]={};
     float theta_values[theta_n];
     std::cout << "Bins for d=" << dist_n << "  bins for theta=" << theta_n<< std::endl;
     for(size_t i=0; i<theta_n; i++)
         theta_values[i] = theta_min + theta_res*i;
-    for(size_t i=0; i<dist_n; i++)
-        for(size_t j=0; j<theta_n; j++)
-            votes[i][j] = 0;
+    //for(size_t i=0; i<dist_n; i++)
+      //  for(size_t j=0; j<theta_n; j++)
+        //    votes[i][j] = 0;
     
     for(size_t i=0; i < img_bin.rows; i++)
         for(size_t j=0; j < img_bin.cols; j++)
@@ -246,11 +246,13 @@ int main(int, char**)
         //F_clone.convertTo(F_clone,CV_8U);
         cv::cvtColor(F_clone, F_clone, cv::COLOR_GRAY2RGB);
 
-        std::vector<cv::Vec2f> lines = hough_lines(F, 0, 356, 2, -M_PI, M_PI, 0.15, hough_threshold);
+        //hough_lines(cv::Mat img_bin, float d_min, float d_max, int d_res, float theta_min,
+        //float theta_max, float theta_res, int threshold)
+
+        std::vector<cv::Vec2f> lines = hough_lines(F, 18, 800, 1, -M_PI, M_PI, 0.05, hough_threshold);
         draw_lines(F_clone, lines);
         std::cout << "Number of lines: " << lines.size() << std::endl;
         imshow("Lines", F_clone);
-
 
         //Change the classs for visualizing Images
         Gm.convertTo(Gm,CV_8UC1);
