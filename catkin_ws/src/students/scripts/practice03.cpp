@@ -183,13 +183,7 @@ void on_threshold_changed(int, void*){}
 int main(int, char**)
 {
     cv::Mat frame,Gm,G,Ga,gray,img_filter,T;
-    cv::Mat SobelX,SobelY,kernel,F;
-    //float Example[3][3]={1,1,1,1,1,1,1,1,1};
-    //cv::Mat Arr=Mat(3, 3, CV_32F, &Example);
-    //cout<<Arr<<endl;
-    //for(size_t i=0; i <= Arr.rows; i++)
-      //  for(size_t j=0; j <= Arr.cols; j++)
-        //    Arr.at<float>(i,j)-=2.1;
+    cv::Mat SobelX,SobelY,kernel,F, Hough;
     //cout<<Arr<<endl;
     float sigma=1.1;
     //--- INITIALIZE VIDEOCAPTURE
@@ -199,9 +193,9 @@ int main(int, char**)
     cap.set(CAP_PROP_FRAME_WIDTH, 640);//Setting the width of the video
     cap.set(CAP_PROP_FRAME_HEIGHT, 480);//Setting the height of the video//
     cv::namedWindow("Original");
-    cv::createTrackbar("Umbral inferior:", "Original", &t1, 14, on_threshold_changed);
-    cv::createTrackbar("Umbral superior:", "Original", &t2, 50, on_threshold_changed);
-    cv::createTrackbar("Tamaño filtro:", "Original", &k_size, 14, on_threshold_changed);
+    cv::createTrackbar("Umbral inferior:", "Original", &t1, 12, on_threshold_changed);
+    cv::createTrackbar("Umbral superior:", "Original", &t2, 22, on_threshold_changed);
+    cv::createTrackbar("Tamaño filtro:", "Original", &k_size, 9, on_threshold_changed);
     cv::createTrackbar("Thr:", "Original", &hough_threshold, 255, on_threshold_changed);
     // check if we succeeded
     if (!cap.isOpened()) {
@@ -248,11 +242,17 @@ int main(int, char**)
 
         //hough_lines(cv::Mat img_bin, float d_min, float d_max, int d_res, float theta_min,
         //float theta_max, float theta_res, int threshold)
-
         std::vector<cv::Vec2f> lines = hough_lines(F, 18, 800, 1, -M_PI, M_PI, 0.05, hough_threshold);
+
+        Hough=frame.clone();
+        draw_lines(Hough, lines);
+
         draw_lines(F_clone, lines);
+
         std::cout << "Number of lines: " << lines.size() << std::endl;
-        imshow("Lines", F_clone);
+
+        //imshow("Hough transform", F_clone);
+        imshow("Hough", Hough);
 
         //Change the classs for visualizing Images
         Gm.convertTo(Gm,CV_8UC1);
@@ -263,7 +263,7 @@ int main(int, char**)
         imshow("Original", frame);
         //imshow("Grey",gray/255.0);
         //imshow("G",G);
-        imshow("T",T);
+        imshow("Canny",F_clone);
         //imshow("F",F);
         //cout<<kernel<<endl;
         if (waitKey(30) == 27)
