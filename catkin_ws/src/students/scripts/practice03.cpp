@@ -242,17 +242,16 @@ int main(int, char**)
 
         //hough_lines(cv::Mat img_bin, float d_min, float d_max, int d_res, float theta_min,
         //float theta_max, float theta_res, int threshold)
-        std::vector<cv::Vec2f> lines = hough_lines(F, 18, 800, 1, -M_PI, M_PI, 0.05, hough_threshold);
-
-        Hough=frame.clone();
-        draw_lines(Hough, lines);
+        std::vector<cv::Vec2f> lines = hough_lines(F, 25, 800, 1, -M_PI, M_PI, 0.05, hough_threshold);
 
         draw_lines(F_clone, lines);
+
+        draw_lines(frame, lines);
 
         std::cout << "Number of lines: " << lines.size() << std::endl;
 
         //imshow("Hough transform", F_clone);
-        imshow("Hough", Hough);
+        //imshow("Hough", Hough);
 
         //Change the classs for visualizing Images
         Gm.convertTo(Gm,CV_8UC1);
