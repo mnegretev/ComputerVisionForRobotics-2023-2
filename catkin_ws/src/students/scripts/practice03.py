@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 
 def main():
-    print("Practice 03")
+    print("Practice 03 realizada en c++")
 
 if __name__ == '__main__':
     main()
