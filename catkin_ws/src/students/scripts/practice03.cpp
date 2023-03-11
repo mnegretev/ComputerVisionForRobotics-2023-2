@@ -193,10 +193,10 @@ int main(int, char**)
     cap.set(CAP_PROP_FRAME_WIDTH, 640);//Setting the width of the video
     cap.set(CAP_PROP_FRAME_HEIGHT, 480);//Setting the height of the video//
     cv::namedWindow("Original");
-    cv::createTrackbar("Umbral inferior:", "Original", &t1, 12, on_threshold_changed);
-    cv::createTrackbar("Umbral superior:", "Original", &t2, 22, on_threshold_changed);
-    cv::createTrackbar("Tamaño filtro:", "Original", &k_size, 9, on_threshold_changed);
-    cv::createTrackbar("Thr:", "Original", &hough_threshold, 255, on_threshold_changed);
+    cv::createTrackbar("Umbral inferior Canny:", "Original", &t1, 12, on_threshold_changed);
+    cv::createTrackbar("Umbral superior Canny:", "Original", &t2, 22, on_threshold_changed);
+    cv::createTrackbar("Tamaño filtro gaussiano:", "Original", &k_size, 9, on_threshold_changed);
+    cv::createTrackbar("Umbral número de votos:", "Original", &hough_threshold, 255, on_threshold_changed);
     // check if we succeeded
     if (!cap.isOpened()) {
         cerr << "ERROR! Unable to open camera\n";
