@@ -1,0 +1,96 @@
+\documentclass[letterpaper,11pt]{article}
+\usepackage[spanish]{babel}
+\spanishdecimal{.}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[top=2.5cm, bottom=3cm, left=2.5cm, right=3cm]{geometry}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\usepackage[natbibapa]{apacite}
+\usepackage{multicol}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\bibliographystyle{apacite}
+
+\definecolor{graywhite}{rgb}{0.9529,0.9607,0.9686}
+\definecolor{bluegray}{rgb}{0.6823, 0.7411, 0.8}
+\definecolor{darkred}{rgb}{0.7372, 0.2392, 0.2392}
+\definecolor{bluedark}{rgb}{0.294, 0.4705, 0.6407}
+\definecolor{darkgreen}{rgb}{0.1764, 0.5294, 0.0901}
+\lstset{
+  backgroundcolor=\color{graywhite},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{darkgreen},    % comment style
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{darkred},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=7pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{bluedark}, % the style that is used for the line-numbers
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{bluedark},     % string literal style
+  frame=single,
+  rulecolor=\color{bluegray},
+  tabsize=2,                   % sets default tabsize to 2 spaces
+  xleftmargin=1cm,
+  xrightmargin=0.5cm,
+  framexleftmargin=0.5cm,
+  extendedchars=true,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1,
+}
+
+
+\title{Práctica 04\\Detector de esquinas de Harris}
+\author{Visión Computacional Aplicada a la Robótica}
+\date{UNAM, 2023-2}
+\begin{document}
+\renewcommand{\tablename}{Tabla}
+
+\maketitle
+
+\subsection*{Resumen}
+El alumno implementará el detector de esquinas de Harris sobre una imagen binaria resultante de una detección de bordes.
+
+
+\subsection*{Objetivos}
+\begin{itemize}
+\item Aplicar el detector de bordes de Canny de la práctica 02.
+\item Aplicar el concepto de gradiente y matriz de segundo momento para detectar esquinas.
+\item Aplicar el detector de esquinas de Harris sobre un fluo de video.  
+\end{itemize}
+
+\section*{Duración}
+1 semanas
+
+\section*{Desarrollo}
+Programe en Python o C++ el detector de esquinas de Harris, que se resume en los siguientes pasos:
+
+\begin{enumerate}
+\item Conversión de la imagen a escala de grises
+\item Obtención de las derivadas parciales $I_x$ e $I_y$
+\item Obtención de la matriz de segundo momento empleando una ventana de tamaño $W$.
+\item Cálculo de la respuesta de Harris
+\item Supresión de no máximos
+\end{enumerate}
+
+El programa de detección de esquinas debe dibujar sobre la imagen original marcadores que indiquen claramente la esquina detectada. 
+
+\textbf{Importante:} No se permite el uso de las funciones de OpenCV que ya realizan lo que se pide: cv2.cornerHarris y cv2.goodFeaturesToTrack. Se puede utilizar la función cv2.Sobel para la obtención de las derivadas parciales.
+\[\]
+Se puede utilizar como base el programa de ejemplo \texttt{harris\_example.cpp}.
+
+\section*{Entregables:}
+\begin{itemize}
+\item Código fuente en la rama correspondiente. 
+\item Imágenes de prueba utilizadas (si es el caso)
+\item Reporte escrito.
+\end{itemize}
+\end{document}
