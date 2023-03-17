@@ -75,7 +75,7 @@ cv::Mat get_harris_response(cv::Mat& lambda, float k){
             float l2 = lambda.at<cv::Vec2f>(i,j)[1];
             R.at<float>(i,j) = l1*l2 - k*(l1+l2)*(l1+l2);
             //if( R.at<float>(i,j) != R.at<float>(i,j)) //Check if the value is nan, nan has the property to always be false
-                continue;
+                //continue;
         }//ventana tamaño 13
     return R.clone();
 }
