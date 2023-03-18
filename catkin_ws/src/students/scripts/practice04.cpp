@@ -67,6 +67,7 @@ cv::Mat Eigen_values(cv::Mat &C){
 }
 
 cv::Mat get_harris_response(cv::Mat& lambda, float k){
+    float max=-1000;
     cv::Mat R = cv::Mat(lambda.rows, lambda.cols, CV_32FC1);
     for(size_t i=0; i < lambda.rows; i++)
         for(size_t j=0; j < lambda.cols; j++)
@@ -74,27 +75,28 @@ cv::Mat get_harris_response(cv::Mat& lambda, float k){
             float l1 = lambda.at<cv::Vec2f>(i,j)[0];
             float l2 = lambda.at<cv::Vec2f>(i,j)[1];
             R.at<float>(i,j) = l1*l2 - k*(l1+l2)*(l1+l2);
-            //if( R.at<float>(i,j) != R.at<float>(i,j)) //Check if the value is nan, nan has the property to always be false
-                //continue;
+            if( R.at<float>(i,j) > max) //Check if the value is nan, nan has the property to always be false
+                max=R.at<float>(i,j) ;
         }//ventana tamaño 13
+    harris_avg=max*umbral/100.0;
     return R.clone();
 }
 
 cv::Mat non_max_supress(cv:: Mat& R, int window_size){
     int w=window_size/2;
-    cv::Mat W=R.clone();
+    cv::Mat W=cv::Mat::zeros(R.rows, R.cols, CV_32FC1);
     for(size_t i=w; i<R.rows-w; i++)
         for(size_t j=w; j<R.cols-w; j++){
             float max=-10000000;
+            if (R.at<float>(i,j)< 0.5*(float)umbral) //harris_avg
+                continue;
             for(int k1=-w; k1<=w; k1++)
                 for(int k2=-w; k2<=w; k2++){
                     if(R.at<float>(i+k1, j+k2) > max)
                         max=R.at<float>(i+k1,j+k2);
                 }
-            if(R.at<float>(i,j)==max && max >harris_avg)
+            if(R.at<float>(i,j)==max)
                 W.at<float>(i,j)=255.0;
-            else
-                W.at<float>(i,j)=0.0;
         }
     W.convertTo(W,CV_8UC1);
     return W.clone();
@@ -119,13 +121,14 @@ int main(int, char**)
     VideoCapture cap;
     // open the default camera using default API
     cap.open(0);
-    cap.set(CAP_PROP_FRAME_WIDTH, 320);//Setting the width of the video
-    cap.set(CAP_PROP_FRAME_HEIGHT, 240);//Setting the height of the video//
+    cap.set(CAP_PROP_FRAME_WIDTH, 640);//Setting the width of the video
+    cap.set(CAP_PROP_FRAME_HEIGHT, 480);//Setting the height of the video//
     cv::namedWindow("Original");
-    cv::createTrackbar("k", "Original", &t1, 100, on_threshold_changed);
-    cv::createTrackbar("Tamaño de Ventana", "Original", &k_size, 20, on_threshold_changed);
-    cv::createTrackbar("Umbral", "Original", &umbral, 640, on_threshold_changed);
+    cv::createTrackbar("k", "Original", &t1, 240, on_threshold_changed);
+    cv::createTrackbar("Tamaño de Ventana", "Original", &k_size, 10, on_threshold_changed);
+    cv::createTrackbar("Umbral minimo", "Original", &umbral, 10, on_threshold_changed);
     cv::setTrackbarMin("k", "Original", 40);
+    cv::setTrackbarMin("Tamaño de Ventana", "Original", 1);
     // check if we succeeded
     if (!cap.isOpened()) {
         cerr << "ERROR! Unable to open camera\n";
@@ -143,7 +146,7 @@ int main(int, char**)
             cerr << "ERROR! blank frame grabbed\n";
             break;
         }
-        harris_avg=float(umbral);
+        //harris_avg=float(umbral);
         gray = frame.clone();
         cv::cvtColor(gray, gray, cv::COLOR_BGR2GRAY);
         // Initialize arguments for the filter
@@ -159,9 +162,9 @@ int main(int, char**)
         draw_corners(frame, corners);
         //R=R/(255.0*255.0*255.0);
         imshow("Original",frame);
-        imshow("Covarianza", C);
-        imshow("Final", W);
-        cout<<harris_avg<<endl;
+        imshow("Harry",R);
+        imshow("Corner", W);
+        //cout<<harris_avg<<endl;
         //imshow("F",F);
         if (waitKey(30) == 27)
             break;

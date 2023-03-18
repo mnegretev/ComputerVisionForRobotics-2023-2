@@ -1,7 +1,12 @@
 #include "opencv2/opencv.hpp"
-
-int trackbar_K = 50;
+using namespace cv;
+double pi = 3.14159265358979323846;
+double delta=0;
+int ddepth=-1;
+int trackbar_K = 30;
 int trackbar_W = 3;
+int trackbar_Kfino=2;
+float t=0;
 
 cv::Mat convolve2d(cv::Mat& A, cv::Mat& kernel)
 {
@@ -72,7 +77,6 @@ cv::Mat get_harris_response(cv::Mat& lambda, float k)
             float l2 = lambda.at<cv::Vec2f>(i,j)[1];
             R.at<float>(i,j) = l1*l2 - k*(l1+l2)*(l1+l2);
         }
-    
     return R;
 }
 
@@ -94,6 +98,7 @@ cv::Mat suppress_non_maximum(cv::Mat& R, int window_size)
         }
     return H;
 }
+
 
 std::vector<cv::Point> corners_harris(cv::Mat& A, int window_size, float k)
 {
@@ -119,13 +124,13 @@ void on_w_changed(int, void*){}
 
 int main()
 {
-    cv::Mat img_original = cv::imread("TestCorners.png");
+    cv::Mat img_original = cv::imread("prueba.jpg");
     cv::namedWindow("Corners");
-    cv::createTrackbar("K:", "Corners", &trackbar_K, 100, on_k_changed);
+    cv::createTrackbar("K:", "Corners", &trackbar_K, 50, on_k_changed);
+    cv::setTrackbarMin("K:", "Corners", 4);
+    cv::createTrackbar("K ajuste fino:", "Corners", &trackbar_Kfino, 10, on_k_changed);
     cv::createTrackbar("W:", "Corners", &trackbar_W, 9, on_k_changed);
-    cv::setTrackbarMin("K", "Corners", 40);
-    cv::setTrackbarMin("W", "Corners", 1);
-
+    cv::setTrackbarMin("W:", "Corners", 1);
     while(cv::waitKey(100) != 27)
     {
         cv::Mat img = img_original.clone();
@@ -133,7 +138,7 @@ int main()
         cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
         gray.convertTo(gray, CV_32F);
         gray /= 255.0f;
-        std::vector<cv::Point> corners = corners_harris(gray, trackbar_W, trackbar_K/1000.0);
+        std::vector<cv::Point> corners = corners_harris(gray, trackbar_W, trackbar_K/100.0+trackbar_Kfino/1000.0);
         draw_corners(img, corners);
         cv::imshow("Corners", img);
     }
