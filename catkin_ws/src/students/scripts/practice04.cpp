@@ -40,6 +40,8 @@ cv::Mat get_sobel_y_gradient(cv::Mat& img){
 
 cv::Mat Covariance_Matrix(cv::Mat &M, int window_size){
     int w=int(window_size/2);
+    float wi=2*w+1;
+    wi=wi*wi;
     cv::Mat Gx=get_sobel_x_gradient(M);
     cv::Mat Gy=get_sobel_y_gradient(M);
     cv::Mat C=cv::Mat::zeros(M.rows, M.cols, CV_32FC3);
@@ -47,9 +49,9 @@ cv::Mat Covariance_Matrix(cv::Mat &M, int window_size){
         for(size_t j=w; j<M.cols-w; j++)
             for(int k1=-w; k1<=w; k1++)
                 for(int k2=-w; k2<=w; k2++){
-                    C.at<cv::Vec3f>(i,j)[0]+=Gx.at<float>(i+k1,j+k2)*Gx.at<float>(i+k1,j+k2); //Covarianza GxGx
-                    C.at<cv::Vec3f>(i,j)[1]+=Gx.at<float>(i+k1,j+k2)*Gy.at<float>(i+k1,j+k2); //Covarianza GyGx
-                    C.at<cv::Vec3f>(i,j)[2]+=Gy.at<float>(i+k1,j+k2)*Gy.at<float>(i+k1,j+k2); //Covarianza GyGy
+                    C.at<cv::Vec3f>(i,j)[0]+=(Gx.at<float>(i+k1,j+k2)*Gx.at<float>(i+k1,j+k2)/wi); //Covarianza GxGx
+                    C.at<cv::Vec3f>(i,j)[1]+=(Gx.at<float>(i+k1,j+k2)*Gy.at<float>(i+k1,j+k2)/wi); //Covarianza GyGx
+                    C.at<cv::Vec3f>(i,j)[2]+=(Gy.at<float>(i+k1,j+k2)*Gy.at<float>(i+k1,j+k2)/wi); //Covarianza GyGy
                 }
     return C.clone();
 }
@@ -87,7 +89,7 @@ cv::Mat non_max_supress(cv:: Mat& R, int window_size){
     for(size_t i=w; i<R.rows-w; i++)
         for(size_t j=w; j<R.cols-w; j++){
             float max=-10000000;
-            if (R.at<float>(i,j)< 0.5) //harris_avg
+            if (R.at<float>(i,j)< 0.1) //harris_avg
                 continue;
             for(int k1=-w; k1<=w; k1++)
                 for(int k2=-w; k2<=w; k2++){
@@ -123,7 +125,7 @@ int main(int, char**)
     cap.set(CAP_PROP_FRAME_WIDTH, 352);//Setting the width of the video
     cap.set(CAP_PROP_FRAME_HEIGHT, 288);//Setting the height of the video//
     cv::namedWindow("Original");
-    cv::createTrackbar("k", "Original", &k, 50, on_threshold_changed);
+    cv::createTrackbar("k", "Original", &k, 30, on_threshold_changed);
     cv::createTrackbar("k ajuste fino", "Original", &k_fino, 10, on_threshold_changed);
     cv::createTrackbar("Tamaño de Ventana", "Original", &w_size, 9, on_threshold_changed);
     cv::setTrackbarMin("k", "Original", 4);
