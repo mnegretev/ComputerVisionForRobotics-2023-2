@@ -3,7 +3,7 @@ using namespace cv;
 double pi = 3.14159265358979323846;
 double delta=0;
 int ddepth=-1;
-int trackbar_K = 30;
+int trackbar_K = 10;
 int trackbar_W = 3;
 int trackbar_Kfino=2;
 float t=0;
@@ -36,6 +36,7 @@ cv::Mat get_sobel_y_gradient(cv::Mat& A)
 cv::Mat matrix_second_moment(cv::Mat& A, int window_size)
 {
     int w = window_size/2;
+    float wi=2*w+1;
     cv::Mat Gx = get_sobel_x_gradient(A);
     cv::Mat Gy = get_sobel_y_gradient(A);
     cv::Mat M      = cv::Mat::zeros(A.rows, A.cols, CV_32FC4);
@@ -44,10 +45,10 @@ cv::Mat matrix_second_moment(cv::Mat& A, int window_size)
             for(int k1=i-w; k1<=i+w; k1++)
                 for(int k2=j-w; k2<=j+w; k2++)
                 {
-                    M.at<cv::Vec4f>(i,j)[0] += Gx.at<float>(k1,k2)*Gx.at<float>(k1,k2);
-                    M.at<cv::Vec4f>(i,j)[1] += Gx.at<float>(k1,k2)*Gy.at<float>(k1,k2);
-                    M.at<cv::Vec4f>(i,j)[2] += Gx.at<float>(k1,k2)*Gy.at<float>(k1,k2);
-                    M.at<cv::Vec4f>(i,j)[3] += Gy.at<float>(k1,k2)*Gy.at<float>(k1,k2);
+                    M.at<cv::Vec4f>(i,j)[0] +=( Gx.at<float>(k1,k2)*Gx.at<float>(k1,k2)/wi);
+                    M.at<cv::Vec4f>(i,j)[1] +=( Gx.at<float>(k1,k2)*Gy.at<float>(k1,k2)/wi);
+                    M.at<cv::Vec4f>(i,j)[2] +=( Gx.at<float>(k1,k2)*Gy.at<float>(k1,k2)/wi);
+                    M.at<cv::Vec4f>(i,j)[3] +=( Gy.at<float>(k1,k2)*Gy.at<float>(k1,k2)/wi);
                 }
     return M;
 }
@@ -126,7 +127,7 @@ int main()
 {
     cv::Mat img_original = cv::imread("prueba.jpg");
     cv::namedWindow("Corners");
-    cv::createTrackbar("K:", "Corners", &trackbar_K, 50, on_k_changed);
+    cv::createTrackbar("K:", "Corners", &trackbar_K, 30, on_k_changed);
     cv::setTrackbarMin("K:", "Corners", 4);
     cv::createTrackbar("K ajuste fino:", "Corners", &trackbar_Kfino, 10, on_k_changed);
     cv::createTrackbar("W:", "Corners", &trackbar_W, 9, on_k_changed);
