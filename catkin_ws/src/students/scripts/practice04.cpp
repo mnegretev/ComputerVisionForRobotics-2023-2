@@ -8,9 +8,9 @@
 using namespace cv;
 using namespace std;
 
-int umbral=1;
-int k_size = 5; //Variable kernel size for the gaussian filter
-int t1=41; // lower threshold
+int k_fino=1;
+int w_size = 3; //Variable kernel size for the gaussian filter
+int k=4; // lower threshold
 double delta=0;
 int ddepth=-1;
 float harris_avg=0;
@@ -78,7 +78,6 @@ cv::Mat get_harris_response(cv::Mat& lambda, float k){
             if( R.at<float>(i,j) > max) //Check if the value is nan, nan has the property to always be false
                 max=R.at<float>(i,j) ;
         }//ventana tamaño 13
-    harris_avg=max*umbral/100.0;
     return R.clone();
 }
 
@@ -88,7 +87,7 @@ cv::Mat non_max_supress(cv:: Mat& R, int window_size){
     for(size_t i=w; i<R.rows-w; i++)
         for(size_t j=w; j<R.cols-w; j++){
             float max=-10000000;
-            if (R.at<float>(i,j)< 0.5*(float)umbral) //harris_avg
+            if (R.at<float>(i,j)< 0.5) //harris_avg
                 continue;
             for(int k1=-w; k1<=w; k1++)
                 for(int k2=-w; k2<=w; k2++){
@@ -121,13 +120,13 @@ int main(int, char**)
     VideoCapture cap;
     // open the default camera using default API
     cap.open(0);
-    cap.set(CAP_PROP_FRAME_WIDTH, 640);//Setting the width of the video
-    cap.set(CAP_PROP_FRAME_HEIGHT, 480);//Setting the height of the video//
+    cap.set(CAP_PROP_FRAME_WIDTH, 352);//Setting the width of the video
+    cap.set(CAP_PROP_FRAME_HEIGHT, 288);//Setting the height of the video//
     cv::namedWindow("Original");
-    cv::createTrackbar("k", "Original", &t1, 240, on_threshold_changed);
-    cv::createTrackbar("Tamaño de Ventana", "Original", &k_size, 10, on_threshold_changed);
-    cv::createTrackbar("Umbral minimo", "Original", &umbral, 10, on_threshold_changed);
-    cv::setTrackbarMin("k", "Original", 40);
+    cv::createTrackbar("k", "Original", &k, 50, on_threshold_changed);
+    cv::createTrackbar("k ajuste fino", "Original", &k_fino, 10, on_threshold_changed);
+    cv::createTrackbar("Tamaño de Ventana", "Original", &w_size, 9, on_threshold_changed);
+    cv::setTrackbarMin("k", "Original", 4);
     cv::setTrackbarMin("Tamaño de Ventana", "Original", 1);
     // check if we succeeded
     if (!cap.isOpened()) {
@@ -152,17 +151,16 @@ int main(int, char**)
         // Initialize arguments for the filter
         gray.convertTo(gray,CV_32FC1); //Change the class type in order to work with float numbers
         gray/=255.0;
-        cv::Mat C=Covariance_Matrix(gray,k_size);
+        cv::Mat C=Covariance_Matrix(gray,w_size);
         cv::Mat E=Eigen_values(C);
         //E/=(255.0*255.0);
-        cv::Mat R=get_harris_response(E, t1/1000.0);
-        cv:Mat W=non_max_supress(R, k_size);
+        cv::Mat R=get_harris_response(E, k/100.0+k_fino/1000.0);
+        cv:Mat W=non_max_supress(R, w_size);
         std::vector<cv::Point> corners;
         cv::findNonZero(W, corners);
         draw_corners(frame, corners);
         //R=R/(255.0*255.0*255.0);
         imshow("Original",frame);
-        imshow("Harry",R);
         imshow("Corner", W);
         //cout<<harris_avg<<endl;
         //imshow("F",F);
