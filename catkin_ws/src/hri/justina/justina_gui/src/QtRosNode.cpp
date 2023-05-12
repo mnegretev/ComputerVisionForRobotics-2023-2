@@ -369,6 +369,7 @@ bool QtRosNode::call_find_lines()
         return false;
     }
     srv.request.point_cloud = *ptr;
+    pcl_ros::transformPointCloud("base_link", srv.request.point_cloud, srv.request.point_cloud, tf_listener);
     bool success = cltFindLines.call(srv);
     if(!success) std::cout << "JustinaGUI.->Cannot find any lines :'(" << std::endl;
     return success;
@@ -385,6 +386,7 @@ bool QtRosNode::call_find_horizontal_planes()
         return false;
     }
     srv.request.point_cloud = *ptr;
+    pcl_ros::transformPointCloud("base_link", srv.request.point_cloud, srv.request.point_cloud, tf_listener);
     bool success = cltFindHoriPlanes.call(srv);
     if(!success) std::cout << "JustinaGUI.->Cannot find any planes :'(" << std::endl;
     return success;
@@ -401,6 +403,7 @@ bool QtRosNode::call_train_object(std::string name)
         return false;
     }
     srv.request.point_cloud = *ptr;
+    pcl_ros::transformPointCloud("base_link", srv.request.point_cloud, srv.request.point_cloud, tf_listener);
     srv.request.name = name;
     return cltTrainObject.call(srv);
 }
@@ -416,6 +419,7 @@ bool QtRosNode::call_recognize_objects()
         return false;
     }
     srv.request.point_cloud = *ptr;
+    pcl_ros::transformPointCloud("base_link", srv.request.point_cloud, srv.request.point_cloud, tf_listener);
     return cltRecogObjects.call(srv);
 }
 
@@ -430,6 +434,7 @@ bool QtRosNode::call_recognize_object(std::string name)
         return false;
     }
     srv.request.point_cloud = *ptr;
+    pcl_ros::transformPointCloud("base_link", srv.request.point_cloud, srv.request.point_cloud, tf_listener);
     srv.request.name = name;
     return cltRecogObject.call(srv);
 }

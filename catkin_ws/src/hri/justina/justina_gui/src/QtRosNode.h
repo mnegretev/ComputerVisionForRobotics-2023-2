@@ -13,6 +13,7 @@
 #include "trajectory_msgs/JointTrajectory.h"
 #include "sound_play/SoundRequest.h"
 #include "tf/transform_listener.h"
+#include "pcl_ros/transforms.h"
 #include "manip_msgs/InverseKinematicsPose2Traj.h"
 #include "manip_msgs/InverseKinematicsPose2Pose.h"
 #include "manip_msgs/ForwardKinematics.h"
