@@ -5,12 +5,11 @@ import math
 
 #-----------------------------------FILTRO GAUSSIANO-----------------------------------------------------
 def convolve2d(A, kernel):
-    return cv2.convertScaleAbs(cv2.filter2D(A, cv2.CV_16S, kernel))
+    return cv2.convertScaleAbs(cv2.filter2D(A, cv2.CV_32F, kernel))
+
 #--------------------------------------------------------------------------------------------------------
 
-
-    
-#------------------------------------------GENERAR EL KERNEL (Se proponen 4)-----------------------------
+#------------------------------------------GENERAR EL KERNEL --------------------------------------------
 def get_gaussian_kernel(k,sigma):
     k = k//2
     H = numpy.zeros((2*k+1, 2*k+1))
@@ -22,23 +21,17 @@ def get_gaussian_kernel(k,sigma):
     return H         
 #-------------------------------------------------------------------------------------------------------
 
-
-
-#------------------------------------------Filtro Sobel x , y and (x,y) --------------------------------
+#------------------------------------------Filtro Sobel x , y  -----------------------------------------
 def get_sobel_x_gradient(A):# gradiente en x
-    Gx = numpy.asarray([[-1, 0, 1],[-2, 0, 2],[-1, 0, 1]])/8.0
+    Gx = numpy.zeros((3, 3, cv2.CV_32FC1))
+    Gx = numpy.asarray([[-1.0, 0.0, 1.0],[-2.0, 0.0, 2.0],[-1.0, 0.0, 1.0]])/8.0
     return convolve2d(A, Gx)
 
 def get_sobel_y_gradient(A):# Gradiente en y
-    Gy = numpy.asarray([[-1, -2, -1],[0, 0, 0],[1, 2, 1]])/8.0
+    Gy = numpy.zeros((3, 3, cv2.CV_32FC1))
+    Gy = numpy.asarray([[-1.0, -2.0, -1],[0.0, 0.0, 0.0],[1.0, 2.0, 1.0]])/8.0
     return convolve2d(A, Gy)
-
-def get_sobel_x_and_y_gradient(A):# Gradiente en y
-    Gx = numpy.asarray([[-1, 0, 1],[-2, 0, 2],[-1, 0, 1]])/8.0
-    Gy = numpy.asarray([[-1, -2, -1],[0, 0, 0],[1, 2, 1]])/8.0
-    return convolve2d(A, Gx), convolve2d(A, Gy)
 #-------------------------------------------------------------------------------------------------------
-
 
 #------------------------------------------ Magnitud y angulo del gradiente ----------------------------
 def get_sobel_mag_angle(A):
@@ -107,20 +100,17 @@ def doble_Umbral_Saturado(Gm,Umin,Umax):
                 G[i,j] = 255
             elif Gm[i,j] >= Umin and Gm[i,j] <= Umax:
                 if Gm[i+1, j] > 0  or Gm[i-1, j] > 0 :
-                    G[i,j] = 220
+                    G[i,j] = 255
                 elif Gm[i, j+1] > 0  or Gm[i, j-1] > 0 :
-                    G[i,j] = 220
+                    G[i,j] = 255
                 elif Gm[i+1, j+1] > 0  or Gm[i-1, j-1] > 0 :
-                    G[i,j] = 220
+                    G[i,j] = 255
                 else:
                     G[i,j] = 0
             else:
                 G[i,j] = 0
     return G.astype(numpy.uint8)
 #-------------------------------------------------------------------------------------------------------
-
-
-
 
 #------------------------------------------------ Filtro CANNY -----------------------------------------
 def canny_border_detector(filtered, Umin, Umax):
@@ -135,8 +125,11 @@ def canny_border_detector_Saturado(filtered, Umin, Umax):
     return G
 #-------------------------------------------------------------------------------------------------------
 
+
+
+
 #-------------------------------------------------------------------------------------------------------
-#-----------------------------Transfomada Hough-------------------------------------------
+#-----------------------------Transfomada Hough---------------------------------------------------------
     
 def transformada_hough(img, umbral, d_min, d_res, theta_min, theta_max, theta_res):
     
@@ -164,9 +157,8 @@ def transformada_hough(img, umbral, d_min, d_res, theta_min, theta_max, theta_re
     return lineas 
 #-------------------------------------------------------------------------------------------------------
 
-
 #-------------------------------------------------------------------------------------------------------
-#-----------------------------Trazar Lineas-------------------------------------------
+#--------------------------------------- Trazar Lineas -------------------------------------------------
     
 def trazar_lineas(G, lines):
     img = numpy.zeros(G.shape)
@@ -183,46 +175,182 @@ def trazar_lineas(G, lines):
         cv2.line(img, (x1, y1), (x2, y2), (255, 255, 255), 2)
     return img
 #-------------------------------------------------------------------------------------------------------
-
-
 def Constante():
     return 0
+#-------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------
+
+
 
 #-------------------------------------------------------------------------------------------------------
+#------------------------ Detector de esquinas de Harry ------------------------------------------------
+
 #-------------------------------------------------------------------------------------------------------
+def convolve2dh(A, kernel):
+    return cv2.filter2D(A, cv2.CV_32F, kernel)
+#-------------------------------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------------------------------
+def get_sobel_x_gradienth(A):# gradiente en x
+    Gx = numpy.asarray([[-1.0, 0.0, 1.0],[-2.0, 0.0, 2.0],[-1.0, 0.0, 1.0]], numpy.float32)
+    return convolve2dh(A, Gx)
+#-------------------------------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------------------------------
+def get_sobel_y_gradienth(A):# Gradiente en y
+    Gy = numpy.asarray([[-1.0, -2.0, -1],[0.0, 0.0, 0.0],[1.0, 2.0, 1.0]], numpy.float32)
+    return convolve2dh(A, Gy)
+#-------------------------------------------------------------------------------------------------------
+
+
+#-------------------------------------------------------------------------------------------------------
+def matrix_segundo_momento(A,W_size):
+    
+    w = W_size//2
+    Gx = get_sobel_x_gradienth(A)
+    Gy = get_sobel_y_gradienth(A)
+   
+    r,c = A.shape
+    M = numpy.zeros((r,c,4))
+    M = numpy.float32(M)
+    
+    for i in range(w, r-w):
+        for j in range(w, c-w):
+            for k1 in range(i-w, i+w+1):
+                for k2 in range(j-w, j+w+1):
+                    M[i,j,0] += Gx [k1,k2]**2
+                    M[i,j,1] += Gx [k1,k2]*Gy [k1,k2]
+                    M[i,j,2] += Gx [k1,k2]*Gy [k1,k2]
+                    M[i,j,3] += Gy [k1,k2]**2
+    cv2.imshow("Derivada en x", Gx)
+    cv2.imshow("Derivada en y", Gy)
+    return M
+#-------------------------------------------------------------------------------------------------------
+
+
+#-------------------------------------------------------------------------------------------------------
+def valores_propios(M):
+    
+    r,cc,e = M.shape
+    lambdaa = numpy.zeros((r,cc,2))
+    lambdaa = numpy.float32(lambdaa)
+    b = 0.00
+    c = 0.00
+    b = numpy.float32(b)
+    c = numpy.float32(c)
+    
+    for i in range(0, r):
+        for j in range(0, cc):
+            
+            m = M[i,j]
+            
+            b = - m[0] - m[3]  
+            c =  (m[0] * m[3] ) + (m[1] * m[2] )
+            
+            lambdaa[i,j,0] = (-b + numpy.sqrt(b**2 - 4*c))/2
+            lambdaa[i,j,1] = (-b - numpy.sqrt(b**2 - 4*c))/2
+    return lambdaa
+#-------------------------------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------------------------------
+def respuesta_Harris(lambdaa, k):
+    
+    r,c,e= lambdaa.shape
+    R =  numpy.zeros((r,c))
+    R = numpy.float32(R)
+    
+    for i in range(0, r):
+        for j in range(0, c):
+            l1 = lambdaa[i,j,0]
+            l2 = lambdaa[i,j,1]
+            R[i,j] = l1 * l2 - k * (l1 + l2) ** 2
+    return R
+#-------------------------------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------------------------------
+def supresion_de_no_maximos_harris(R, W_size):
+    
+    w = W_size//2
+    r,c= R.shape
+    H = numpy.zeros(R.shape)
+    for i in range(0, r):
+        for j in range(0, c):
+            
+            if R[i,j] < 0.5:
+                continue
+            max_v = -999999
+            max_v = numpy.float32(max_v)
+            for k1 in range(i-w, i+w+1):
+                for k2 in range(j-w, j+w+1):
+                    if k1 >= 0  and k1< r and k2 >= 0  and k2 < c: 
+                        if  R[k1,k2] > max_v :
+                            max_v = R[k1,k2]
+            if  max_v == R[i,j] :
+                H[i,j] = 255
+            else :
+                H[i,j] = 0
+    return H
+#-------------------------------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------------------------------
+def corners_harris(A, W_size,k):
+
+    M = matrix_segundo_momento(A,W_size)
+    lambdaa = valores_propios(M)
+    R = respuesta_Harris(lambdaa, k)
+    H = supresion_de_no_maximos_harris(R, W_size)
+    
+    cv2.imshow("2do Momento", M)
+    cv2.imshow("respuesta H", R)
+    cv2.imshow("Sup no max", H)
+    
+    corner = cv2.findNonZero(H)
+    
+    return corner
+#-------------------------------------------------------------------------------------------------------
+
+
+#-------------------------------------------------------------------------------------------------------
+def draw_corners(img, corners):
+    
+    H = numpy.zeros(img.shape)
+    for i in range(len(corners)):
+       cv2.circle(img, tuple(corners[i][0]),1,(0,0,255),-1)
+    H = img
+    return H
+
+def draw_cornersG(img, corners):
+    
+    H = numpy.zeros(img.shape)
+    for i in range(len(corners)):
+       cv2.circle(img, tuple(corners[i][0]),4,(0,0,255),-1)
+    H = img
+    return H
+#-------------------------------------------------------------------------------------------------------  
+    
 
 def main():
 
     #----------------------------------------
     #--------- Video ------------------------
     cap  = cv2.VideoCapture(0)
-    
     #------ Kernel y umbrales ---------------
     kernel = get_gaussian_kernel(5,1)
-    kernel_1 = get_gaussian_kernel(7,1)
-    kernel_2 = get_gaussian_kernel(3,1)
-    
-    pv = cv2.imread("Prueba.png");
-    Pv= cv2.cvtColor(pv, cv2.COLOR_BGR2GRAY)
-    PV = numpy.zeros(pv.shape)
-    
+    #----------------------------------------
     Umin = 5
     Umax = 255
     #------ Porcentaje de escala ------------
     scale_percent = 30
-    
     #------ Variable auxiliar ---------------
     aux1 = 0
-    Umbral = 50
-    cv2.namedWindow('Transformada Hough')
-    cv2.createTrackbar('Umbral','Transformada Hough',Umbral, 100, Constante)
-   #-----------------------------------------
-   
+    #----------------------------------------
+    Prueba = cv2.imread("TestCorners.png");
+    PruebaCopy = Prueba.copy()
+    Pruebaceros = numpy.zeros(Prueba.shape)
+    
+    #-----------------------------------------
     while cap.isOpened():
-    
-    
-    
-        #--------- Video -----------------------------------------------------------------
+    #--------- Video -----------------------------------------------------------------
         ret, frame = cap.read()
         if not ret:
             print("Can't receive frame (stream end?). Exiting ...")
@@ -234,64 +362,46 @@ def main():
             width = int(frame.shape[1] * scale_percent / 100)
             height = int(frame.shape[0] * scale_percent / 100)
             dsize = (width, height)
-            aux1 = 1
+            aux1 = 7
         output = cv2.resize(frame, dsize)
         output = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
         #------------------------------------------------------------------------------------
         
         
         #--------- Escala la imagen --------------------------------------------------------
-        if aux1 == 1:
-            filtered = convolve2d(output, kernel)
-            Gx = get_sobel_x_gradient(filtered)
-            Gy = get_sobel_y_gradient(filtered)
-            cv2.imshow("Filtro Sobel en x Gx", Gx)
-            cv2.imshow("Filtro Sobel en y Gy", Gy)
-        elif aux1 == 2:
-            filtered = convolve2d(output, kernel)
-            Gm, Ga = get_sobel_mag_angle(filtered )
-            cv2.imshow("Angulo del gradiente Ga", Ga)
-            cv2.imshow("Magnitud del gradiente Gm", Gm)
-        elif aux1 == 3:
-            filtered = convolve2d(output, kernel)
-            Gm, Ga = get_sobel_mag_angle(filtered )
-            cv2.imshow("Angulo del gradiente Ga", Ga)
-            cv2.imshow("Magnitud del gradiente Gm", Gm)
-        elif aux1 == 4:
-            filtered = convolve2d(output, kernel)
-            Gm, Ga = get_sobel_mag_angle(filtered )
-            G = supress_non_maximum(Gm, Ga)
-            cv2.imshow("Supresion de no maximos", G)
-        elif aux1 == 4:
-            filtered = convolve2d(output, kernel)
-            Gm, Ga = get_sobel_mag_angle(filtered )
-            G = supress_non_maximum(Gm, Ga)
-            Gf = doble_Umbral(G,Umin,Umax)
-            cv2.imshow("Histeresis", Gf)
-        elif aux1 == 5:
-            filtered = convolve2d(output, kernel)
-            G = canny_border_detector(filtered,Umin,Umax)
-            cv2.imshow("Filtro Kanny", G)       
-        elif aux1 == 6:
-            filtered = convolve2d(output, kernel)
-            G = canny_border_detector_Saturado(filtered,Umin,Umax)
-            cv2.imshow("Filtro Kanny Saturado", G) 
-        elif aux1 == 7:
-            lines = transformada_hough(Pv, 200, 0,3, -numpy.pi/2, numpy.pi/2, numpy.pi/180)
-            PV = trazar_lineas(PV,lines)
-            cv2.imshow("PruebaHough", PV)
+        if aux1 == 7:
+            img = cv2.cvtColor(PruebaCopy, cv2.COLOR_BGR2GRAY)      
+            img = numpy.float32(img)
+            img = img/255.0
+            corner = corners_harris(img, 3,50/1000.0)
+            H = draw_cornersG(Prueba, corner)
+            cv2.imshow("Prueba Harris", H)
         elif aux1 >= 8:
+            cv2.imshow("Video", output)
+            
             filtered = convolve2d(output, kernel)
             G = canny_border_detector_Saturado(filtered,10,255)
+            cv2.imshow("Kanny Saturado", G)
+            
             GG = numpy.zeros(G.shape)
-            lines = transformada_hough(G, 80, 0,3, -numpy.pi/2, numpy.pi/2, numpy.pi/180)
-            GG = trazar_lineas(PV,lines)
-            cv2.imshow("Transformada Hough", GG)
+            lines = transformada_hough(G, 40, 0,3, -numpy.pi/2, numpy.pi/2, numpy.pi/180)
+            GG = trazar_lineas(GG,lines)
+            GG = GG.astype(numpy.uint8)
+            cv2.imshow("Lineas", GG)
+              
+            Gp = G.copy()
+            img_1 = cv2.cvtColor(G, cv2.COLOR_GRAY2BGR)      
+            img = numpy.float32(Gp)
+            cv2.imshow("Imagen en escala de grises", img)
+            img = img/255.0
+            corner = corners_harris(img, 3, 246/1000.0)
+            H = draw_corners(img_1, corner)
+            cv2.imshow("Sol Harris", H)
             
         else:
             cv2.imshow("Video", output)
         
-        if aux1 <= 9:
+        if aux1 <= 8:
            aux1 += 1
         #------------------------------------------------------------------------------------
         
@@ -305,4 +415,4 @@ def main():
 if __name__ == '__main__':
     main()
 #-------------------------------------------------------------------------------------------------------
-
+#-------------------------------------------------------------------------------------------------------
