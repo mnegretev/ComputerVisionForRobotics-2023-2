@@ -16,7 +16,7 @@ from vision_msgs.srv import FindPlanes, FindPlanesResponse
 from vision_msgs.srv import RecognizeObjects
 from visualization_msgs.msg import Marker
 
-NAME = "FULL_NAME"
+NAME = "SERGIO ALVARADO RAMOS"
 
 def find_plane_by_ransac(points, min_points, tolerance, max_attempts):
     #
@@ -37,13 +37,51 @@ def find_plane_by_ransac(points, min_points, tolerance, max_attempts):
     # Get eigenvalues and eigenvectors of the covariance matrix of P
     # Return the following values:
     # mean_point, normal_to_plane, number_of_inliers, min_point, max_point
-
-    mean = numpy.asarray([0,0,0])
-    normal = numpy.asarray([0,0,0])
     inliers_counting = 0
-    min_p = numpy.asarray([0,0,0])
-    max_p = numpy.asarray([0,0,0])
-    return mean, normal, inliers_counting, min_p, max_p 
+    mean = numpy.asarray([0,0,0])
+    n=points.shape
+    print(n)
+    while(inliers_counting<min_points and max_attempts>0):
+        inliers_counting=0
+        p1,p2,p3=points[numpy.random.randint(n[0], size=3)] #points 1,2,3
+        pc=(p1+p2+p3)/3 #plane center
+        normal=numpy.cross( (p1-p2), (p1-p3) )
+        normal=normal/numpy.linalg.norm(normal)
+        d=numpy.zeros(n[0])
+        for i in range(n[0]):
+            d[i]=abs(numpy.dot(normal, points[i,:]-pc) )
+                #print(d[i])
+                #print(normal)
+                #print(points[i,:])
+            if d[i]< tolerance:
+                inliers_counting+=1
+        mask = (d[:] < tolerance)
+        max_attempts-=1
+    P=points[mask,:]
+    print(P.shape)
+    print(pc)
+    A=numpy.cov(numpy.transpose(P))
+    print(inliers_counting)
+    #print(points[mask,:])
+    mean=numpy.mean(P, axis=0)
+    #mean = numpy.asarray([0,0,0])
+    #normal = numpy.asarray([0,0,0])
+    W,V=numpy.linalg.eig(A)
+    print(W)
+    print(V)
+    #i=numpy.argmin(W)
+    j=numpy.argmax(W)
+    Qpca=V[:,j]
+    Ppca=numpy.dot(P, Qpca)
+    i_min=numpy.argmin(Ppca)
+    i_max=numpy.argmax(Ppca)
+    [x1,y1,z1]=P[i_min,:]
+    [x2,y2,z2]=P[i_max,:]
+    min_p=[x1,y1,z1]
+    max_p=[x2,y2,z2]
+    print(min_p)
+    print(max_p)
+    return mean, normal, inliers_counting, min_p, max_p
 
 def get_plane_marker(min_p, max_p):
     marker = Marker();
@@ -65,7 +103,7 @@ def callback_find_planes(req):
     print("Trying to find table plane...")
     xyz = ros_numpy.point_cloud2.pointcloud2_to_xyz_array(req.point_cloud)
     xyz = xyz[(xyz[:,0] > 0.3) & (xyz[:,0] < 2.0) & (xyz[:,1] > -2.0) & (xyz[:,1] < 2.0) & (xyz[:,2] > 0.5) & (xyz[:,2] < 1.5)]
-    mean, normal, n_points, min_point, max_point = find_plane_by_ransac(xyz, 150000, 0.03, 5)
+    mean, normal, n_points, min_point, max_point = find_plane_by_ransac(xyz, 18000, 0.03, 100)
     pub_marker.publish(get_plane_marker(min_point, max_point))
     print("Found plane with mean " + str(mean) + " and normal " + str(normal))
     return FindPlanesResponse()
