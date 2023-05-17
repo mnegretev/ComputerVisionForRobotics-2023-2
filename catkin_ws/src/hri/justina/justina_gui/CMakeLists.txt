@@ -15,9 +15,11 @@ find_package(catkin REQUIRED COMPONENTS
   vision_msgs
   trajectory_msgs
   hri_msgs
+  pcl_ros
 )
 
 find_package(Qt5Widgets REQUIRED)
+find_package(PCL REQUIRED)
 
 if (Qt5Widgets_FOUND)
     if (Qt5Widgets_VERSION VERSION_LESS 5.0)
@@ -45,7 +47,7 @@ catkin_package()
 
 add_definitions(${Qt5Widgets_DEFINITIONS})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} -std=c++11")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} -std=c++11")
 
 qt5_wrap_ui(QT_FORMS_HPP ${QT_FORMS})
 qt5_add_resources(QT_RESOURCES_CPP ${QT_RESOURCES})
