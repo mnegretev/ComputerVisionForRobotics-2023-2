@@ -2,7 +2,7 @@
 # COMPUTER VISION FOR ROBOTICS - FI-UNAM - 2023-2
 # PRACTICE 01 - THE OPENCV LIBRARY
 #
-
+lll
 import cv2
 import numpy as np
 
