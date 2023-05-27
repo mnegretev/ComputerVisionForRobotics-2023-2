@@ -40,7 +40,7 @@ def find_plane_by_ransac(points, min_points, tolerance, max_attempts):
     inliers_counting = 0
     mean = numpy.asarray([0,0,0])
     n=points.shape
-    print(n)
+    #print(n)
     while(inliers_counting<min_points and max_attempts>0):
         inliers_counting=0
         p1,p2,p3=points[numpy.random.randint(n[0], size=3)] #points 1,2,3
@@ -50,37 +50,37 @@ def find_plane_by_ransac(points, min_points, tolerance, max_attempts):
         d=numpy.zeros(n[0])
         for i in range(n[0]):
             d[i]=abs(numpy.dot(normal, points[i,:]-pc) )
-                #print(d[i])
+            #print(d[i])
                 #print(normal)
                 #print(points[i,:])
             if d[i]< tolerance:
+                #print(points[i])
                 inliers_counting+=1
         mask = (d[:] < tolerance)
         max_attempts-=1
     P=points[mask,:]
-    print(P.shape)
-    print(pc)
+    #print(P.shape)
+    #print(pc)
+    #print(normal)
     A=numpy.cov(numpy.transpose(P))
-    print(inliers_counting)
-    #print(points[mask,:])
     mean=numpy.mean(P, axis=0)
     #mean = numpy.asarray([0,0,0])
     #normal = numpy.asarray([0,0,0])
     W,V=numpy.linalg.eig(A)
-    print(W)
-    print(V)
-    #i=numpy.argmin(W)
-    j=numpy.argmax(W)
-    Qpca=V[:,j]
-    Ppca=numpy.dot(P, Qpca)
-    i_min=numpy.argmin(Ppca)
-    i_max=numpy.argmax(Ppca)
-    [x1,y1,z1]=P[i_min,:]
-    [x2,y2,z2]=P[i_max,:]
-    min_p=[x1,y1,z1]
-    max_p=[x2,y2,z2]
-    print(min_p)
-    print(max_p)
+    #print(W)
+    #print(V)
+    j=numpy.argmin(W)
+    normal=V[:,j]
+    x_min=min(P[:,0])
+    y_min=min(P[:,1])
+    z_min=min(P[:,2])
+    min_p=numpy.asarray([x_min,y_min,z_min])
+    x_max=max(P[:,0])
+    y_max=max(P[:,1])
+    z_max=max(P[:,2])
+    max_p=numpy.asarray([x_max,y_max,z_max])
+    #print(min_p)
+    #print(max_p)
     return mean, normal, inliers_counting, min_p, max_p
 
 def get_plane_marker(min_p, max_p):
