@@ -42,39 +42,30 @@ class NeuralNetwork(object):
             z = numpy.dot(self.weights[i], x) + self.biases[i]
             x = 1.0 / (1.0 + numpy.exp(-z))  #output of the current layer is the input of the next one
         return x
-
+    
+    
     def feedforward_verbose(self, x):
-        #
-        # TODO:
-        # Write a function similar to 'feedforward' but instead of returning only the output layer,
-        # return a list containing the output of each layer, from input to output.
-        # Include input x as the first output.
-        #
-        y = []
+        y = [x]  # Include input x as the first output
+        for i in range(len(self.biases)):
+            z = numpy.dot(self.weights[i], y[i]) + self.biases[i]
+            activation = 1.0 / (1.0 + numpy.exp(-z))
+            y.append(activation) 
         return y
 
     def backpropagate(self, x, yt):
         y = self.feedforward_verbose(x)
         nabla_b = [numpy.zeros(b.shape) for b in self.biases]
         nabla_w = [numpy.zeros(w.shape) for w in self.weights]
-        # TODO:
-        # Return a tuple [nabla_w, nabla_b] containing the gradient of cost function C with respect to
-        # each weight and bias of all the network. The gradient is calculated assuming only one training
-        # example is given: the input 'x' and the corresponding label 'yt'.
-        # nabla_w and nabla_b should have the same dimensions as the corresponding
-        # self.weights and self.biases
-        # You can calculate the gradient following these steps:
-        #
-        # Calculate delta for the output layer L: delta=(yL-yt)*yL*(1-yL)
-        # nabla_b of output layer = delta      
-        # nabla_w of output layer = delta*yLpT where yLpT is the transpose of the ouput vector of layer L-1
-        # FOR all layers 'l' from L-1 to input layer: 
-        #     delta = (WT * delta)*yl*(1 - yl)
-        #     where 'WT' is the transpose of the matrix of weights of layer l+1 and 'yl' is the output of layer l
-        #     nabla_b[-l] = delta
-        #     nabla_w[-l] = delta*ylpT  where ylpT is the transpose of outputs vector of layer l-1
-        #
-
+    
+        delta = (y[-1] - yt) * y[-1] * (1 - y[-1])
+        nabla_b[-1] = delta
+        nabla_w[-1] = numpy.dot(delta, y[-2].T)
+    
+        for l in range(2, self.num_layers):
+            delta = numpy.dot(self.weights[-l+1].T, delta) * y[-l] * (1 - y[-l])
+            nabla_b[-l] = delta
+            nabla_w[-l] = numpy.dot(delta, y[-l-1].T)
+        
         return nabla_w, nabla_b
 
     def update_with_batch(self, batch, eta):
@@ -139,7 +130,7 @@ def main():
     rospy.init_node("practice06")
     rospack = rospkg.RosPack()
     dataset_folder = rospack.get_path("config_files") + "/handwritten_digits/"
-    epochs        = 3
+    epochs        = 30
     batch_size    = 10
     learning_rate = 3.0
     
