@@ -19,31 +19,37 @@ from visualization_msgs.msg import Marker
 NAME = "FULL_NAME"
 
 def find_plane_by_ransac(points, min_points, tolerance, max_attempts):
-    #
-    # TODO:
-    #
-    # Find a plane given by a point and a normal vector. You can use the following steps:
-    #
-    # Set number_of_inliers to zero
-    # WHILE number_of_inliers < min_points and max_attempts > 0:
-    #    Get p1,p2,p3 as random samples of the set of points
-    #    Calculate the plane center as the mean of the three points
-    #    Calculate the normal to the three points (p1 - p2)x(p1 - p3)
-    #    Calculate de distance to the candidate plane for each point p in points
-    #    Get all points with a distance less than tolerance
-    #    Get the number_of_inliers
-    #    Decrease attempts by one
-    # Get the set P of all points with distance to plane less than tolerance
-    # Get eigenvalues and eigenvectors of the covariance matrix of P
-    # Return the following values:
-    # mean_point, normal_to_plane, number_of_inliers, min_point, max_point
+    
+    number_of_inliers = 0
 
-    mean = numpy.asarray([0,0,0])
-    normal = numpy.asarray([0,0,0])
-    inliers_counting = 0
-    min_p = numpy.asarray([0,0,0])
-    max_p = numpy.asarray([0,0,0])
-    return mean, normal, inliers_counting, min_p, max_p 
+    while number_of_inliers < min_points and max_attempts > 0:
+
+        random_indices = numpy.random.choice(len(points), 3, replace=False)
+        p1, p2, p3 = points[random_indices]
+
+        center = (p1 + p2 + p3) / 3
+
+        normal = numpy.cross(p1 - p2, p1 - p3)
+
+        distances = numpy.abs(numpy.dot(points - center, normal))
+
+        inliers = points[distances < tolerance]
+
+        number_of_inliers = len(inliers)
+
+        max_attempts -= 1
+
+    P = points[distances < tolerance]
+
+    covariance_matrix = numpy.cov(P, rowvar=False)
+    eigenvalues, eigenvectors = numpy.linalg.eig(covariance_matrix)
+
+    mean_point = numpy.mean(P, axis=0)
+    normal_to_plane = eigenvectors[:, numpy.argmin(eigenvalues)]
+    min_point = numpy.min(P, axis=0)
+    max_point = numpy.max(P, axis=0)
+
+    return mean_point, normal_to_plane, number_of_inliers, min_point, max_point
 
 def get_plane_marker(min_p, max_p):
     marker = Marker();
