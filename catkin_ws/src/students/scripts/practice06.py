@@ -51,12 +51,27 @@ class NeuralNetwork(object):
         # Include input x as the first output.
         #
         y = []
+        y.append(x)
+        for i in range(len(self.biases)):
+            z = numpy.dot(self.weights[i], x) + self.biases[i]
+            x = 1.0 / (1.0 + numpy.exp(-z))  #output of the current layer is the input of the next one
+            y.append(x) 
         return y
 
     def backpropagate(self, x, yt):
         y = self.feedforward_verbose(x)
         nabla_b = [numpy.zeros(b.shape) for b in self.biases]
         nabla_w = [numpy.zeros(w.shape) for w in self.weights]
+        
+        delta=(y[-1]-yt)*y[-1]*(1-y[-1])
+        nabla_b[-1]=delta  
+        nabla_w[-1]=delta*y[-2].T
+        
+        for a in range(2,self.num_layers):
+            delta=numpy.dot(self.weights[-a+1].T,delta)*y[-a]*(1-y[-a])
+            nabla_b[-a]=delta
+            nabla_w[-a]=delta*y[0].T
+        
         # TODO:
         # Return a tuple [nabla_w, nabla_b] containing the gradient of cost function C with respect to
         # each weight and bias of all the network. The gradient is calculated assuming only one training
@@ -139,7 +154,7 @@ def main():
     rospy.init_node("practice06")
     rospack = rospkg.RosPack()
     dataset_folder = rospack.get_path("config_files") + "/handwritten_digits/"
-    epochs        = 3
+    epochs        = 10
     batch_size    = 10
     learning_rate = 3.0
     
