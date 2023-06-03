@@ -1,4 +1,19 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed May 24 02:31:32 2023
+
+@author: cv
+"""
+
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+
+#!/usr/bin/env python3
 #
 # COMPUTER VISION FOR ROBOTICS - UNAM, FI, 2023-2
 # PRACTICE 06 - TRAINING A NEURAL NETWORK
@@ -14,7 +29,7 @@ import numpy
 import rospy
 import rospkg
 
-NAME = "FULL_NAME"
+NAME = "Kelly Del Moral"
 
 class NeuralNetwork(object):
     def __init__(self, layers, weights=None, biases=None):
@@ -49,8 +64,13 @@ class NeuralNetwork(object):
         # Write a function similar to 'feedforward' but instead of returning only the output layer,
         # return a list containing the output of each layer, from input to output.
         # Include input x as the first output.
-        #
+        #                        
         y = []
+        y.append(x)
+        for i in range(len(self.biases)):
+            z = numpy.dot(self.weights[i], x) + self.biases[i]
+            x = 1.0 / (1.0 + numpy.exp(-z))  #output of the current layer is the input of the next one
+            y.append(x)
         return y
 
     def backpropagate(self, x, yt):
@@ -71,10 +91,22 @@ class NeuralNetwork(object):
         # FOR all layers 'l' from L-1 to input layer: 
         #     delta = (WT * delta)*yl*(1 - yl)
         #     where 'WT' is the transpose of the matrix of weights of layer l+1 and 'yl' is the output of layer l
-        #     nabla_b[-l] = delta
+        #     nabla_b[-l] = deltc
         #     nabla_w[-l] = delta*ylpT  where ylpT is the transpose of outputs vector of layer l-1
         #
-
+        delta=(y[-1]-yt)*y[-1]*(1-y[-1])
+        nabla_b[-1]=delta
+        ylpt=numpy.transpose(y[-2]) 
+        nabla_w[-1]=delta*ylpt 
+        for i in range(2,(self.num_layers)):
+            WT=numpy.transpose(self.weights[-i+1])
+            k=y[-i]*(1-y[-i])
+            temp=numpy.dot(WT,delta)
+            delta=temp*k
+            nabla_b[-i]=delta 
+            ylpt=numpy.transpose(y[-i-1])
+            nabla_w[-i]=delta*ylpt  
+           
         return nabla_w, nabla_b
 
     def update_with_batch(self, batch, eta):

@@ -37,12 +37,53 @@ def find_plane_by_ransac(points, min_points, tolerance, max_attempts):
     # Get eigenvalues and eigenvectors of the covariance matrix of P
     # Return the following values:
     # mean_point, normal_to_plane, number_of_inliers, min_point, max_point
-
-    mean = numpy.asarray([0,0,0])
-    normal = numpy.asarray([0,0,0])
-    inliers_counting = 0
-    min_p = numpy.asarray([0,0,0])
-    max_p = numpy.asarray([0,0,0])
+    #<<<<<<< HEAD
+    number_of_inliers= 0
+    n=len(points)  #checar dimensiones
+    #p1,p2,p3=numpy.random.sample(points,3)
+    # print(points)
+    #print(n)
+    #print(p1)
+    while (number_of_inliers < min_points and max_attempts > 0):
+          p1=numpy.random.choice(n,3)
+          p2=numpy.random.choice(n,3)
+          p3=numpy.random.choice(n,3)
+          planecenter=(p1+p2+p3)/3
+          normal=numpy.cross((p1-p2),(p1-p3))  #producto cruz normal a ambos
+          normal=normal/numpy.linalg.norm(normal)  #dividir entre su magnitud
+          inliers_counting = 0
+          dis=numpy.zeros(n)
+          max_attempts=max_attempts-1
+          for i in range (n):
+              dis[i]=numpy.dot(normal,points[i,:]-planecenter)   # valor absoluto y producto punto 
+              dis[i]=abs(dis[i])
+              if dis[i]<tolerance:
+                  inliers_counting =inliers_counting+1
+                  P=points[i,:]
+                  covarianza=numpy.cov(P,rowvar=False)   
+                  evalo,evec=numpy.linalg.eige(covarianza)  
+                  mean=numpy.mean(P,axis=0)
+                  min_p=numpy.min(P,axis=0)
+                  max_p=numpy.max(P,axis=0)
+                  print(mean)
+                  #return mean, normal, inliers_counting, min_p, max_p 
+    		   #normal = numpy.asarray([0,0,0])
+                  #inliers_counting = 0
+    		   
+                  
+          #print(n)
+          #print(p1)         
+          # covarianza =numpy.cov(P,rowvar=False)   
+          #evalo,evec =numpy.linalg.eige(covarianza)   
+                  
+                  #guardar puntos 
+                  #decrementar max attemps
+          
+    #mean = numpy.asarray([0,0,0])
+    #normal = numpy.asarray([0,0,0])
+    #inliers_counting = 0
+    #min_p = numpy.asarray([0,0,0])
+    #max_p = numpy.asarray([0,0,0])
     return mean, normal, inliers_counting, min_p, max_p 
 
 def get_plane_marker(min_p, max_p):
