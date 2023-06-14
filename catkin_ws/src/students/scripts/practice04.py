@@ -242,8 +242,8 @@ def change_window_size(value):
     
 def main():
   # Creación de ventana y trackbar para modificar el tamaño de la ventana de Harris
-    cv2.namedWindow("Configuración")
-    cv2.createTrackbar("Tamaño de ventana", "Configuración", window_size, 15, change_window_size)
+    cv2.namedWindow("Configuracion")
+    cv2.createTrackbar("Tamaño de ventana", "Configuracion", window_size, 15, change_window_size)
 
     cap = cv2.VideoCapture(0)
     kernel = get_gaussian_kernel(5, 1)
