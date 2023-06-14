@@ -106,6 +106,7 @@ def main():
     cap  = cv2.VideoCapture(0) #Default resolution 1920x1080
     cap.set(3, 640) #Change the camera resolution to 640x480
     cap.set(4, 480)
+    cv2.namedWindow('Original')
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
