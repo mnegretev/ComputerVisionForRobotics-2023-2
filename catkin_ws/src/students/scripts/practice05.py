@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # COMPUTER VISION FOR ROBOTICS - FI-UNAM - 2023-2
 # PRÁCTICA 05 - SEGMENTACIÓN DE LÍNEAS Y PLANOS MEDIANTE RANSAC Y PCA
 #
@@ -18,8 +19,10 @@ NAME = "TU_NOMBRE_COMPLETO"
 
 def find_plane_by_ransac(points, min_points, tolerance, max_attempts):
     number_of_inliers = 0
+    print("1")
     while number_of_inliers < min_points and max_attempts > 0:
         # Obtener p1, p2, p3 como muestras aleatorias del conjunto de puntos
+        print("2")
         indices = np.random.choice(len(points), size=3, replace=False)
         p1, p2, p3 = points[indices[0]], points[indices[1]], points[indices[2]]
         
@@ -29,7 +32,7 @@ def find_plane_by_ransac(points, min_points, tolerance, max_attempts):
         # Calcular el vector normal a partir de los tres puntos (p1 - p2) x (p1 - p3)
         normal = np.cross(p1 - p2, p1 - p3)
         normal /= np.linalg.norm(normal)
-        
+        print("3")
         # Calcular la distancia al plano candidato para cada punto p en points
         distancias = np.abs(np.dot(points - centro, normal))
         
@@ -38,17 +41,18 @@ def find_plane_by_ransac(points, min_points, tolerance, max_attempts):
         number_of_inliers = len(inliers)
         
         max_attempts -= 1
-    
+    print("4")
     # Obtener el conjunto P de todos los puntos con distancia al plano menor que la tolerancia
     P = points[distancias < tolerance]
-    
+    print("5")
     # Obtener los valores y vectores propios de la matriz de covarianza de P
     _, _, V = np.linalg.svd(P - np.mean(P, axis=0))
-    
+    print("6")
     # Devolver los siguientes valores:
     mean_point = np.mean(P, axis=0)
     normal_to_plane = V[-1]  # El último vector propio corresponde a la normal
     number_of_inliers = len(P)
+    print("7")
     min_point = np.min(P, axis=0)
     max_point = np.max(P, axis=0)
     
