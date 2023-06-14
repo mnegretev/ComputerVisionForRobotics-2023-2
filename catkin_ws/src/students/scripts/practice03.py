@@ -202,7 +202,7 @@ def main():
     kernel_1 = get_gaussian_kernel(7,1)
     kernel_2 = get_gaussian_kernel(3,1)
     
-    pv = cv2.imread("Prueba.png");
+    pv = cv2.imread("baboonn.jpg");
     Pv= cv2.cvtColor(pv, cv2.COLOR_BGR2GRAY)
     PV = numpy.zeros(pv.shape)
     
