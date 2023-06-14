@@ -92,19 +92,19 @@ def main():
     x1,y1,x2,y2=0,0,0,0
     tolerance = 10
     home_path = str(Path.home())
-    background = cv2.imread(home_path+'/ComputerVisionForRobotics-2023-2/Media/background.jpg') #100*np.ones((480,640), np.uint8)
+    background = cv2.imread(home_path+'/CLASES/ComputerVisionForRobotics-2023-2/Media/background.jpg') #100*np.ones((480,640), np.uint8)
     cap  = cv2.VideoCapture(0) #Default resolution 1920x1080
     cap.set(3, 640) #Change the camera resolution to 640x480
     cap.set(4, 480)
+    cv2.namedWindow('Edit')
+    cv2.setMouseCallback('Edit', mouse_callback) #captura el mouse
+    cv2.createTrackbar('r','Edit',tolerance, 150, trackbar_callback)
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             print("Can't receive frame (stream end?). Exiting ...")
             break
         frame_copy = frame.copy()
-        cv2.namedWindow('Edit')
-        cv2.setMouseCallback('Edit', mouse_callback) #captura el mouse
-        cv2.createTrackbar('r','Edit',tolerance, 150, trackbar_callback)
         if show:
             cv2.rectangle(frame_copy, (x1,y1),(x2,y2), (0,255,0),3)
         if crop:
