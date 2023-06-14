@@ -78,6 +78,7 @@ def main():
             final=cv2.add(fondo,invertida)
             cv2.imshow('clone',final)
             cv2.imshow('image',clone)
+            cv2.imshow('background', playa)
 
             if cv2.waitKey(1) & 0xFF == ord('s'):
                 break
