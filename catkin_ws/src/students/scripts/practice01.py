@@ -34,7 +34,7 @@ ancho_cuadro = int(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
 alto_cuadro = int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
 # Cargar y redimensionar la imagen de fondo
-fondo = cv2.imread('fondo.png')
+fondo = cv2.imread('Fondo.png')
 fondo = cv2.resize(fondo, (ancho_cuadro, alto_cuadro))
 
 # Crear una ventana y adjuntar a ella la función de devolución de llamada del ratón
