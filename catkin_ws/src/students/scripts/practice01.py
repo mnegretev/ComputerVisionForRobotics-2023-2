@@ -120,7 +120,7 @@ def main():
                img_or     = cv2.bitwise_or (img_andd, img_and) 
                img_xor     = cv2.bitwise_xor (img_andd, img_and)
                cv2.imshow('Baboon', img_baboon)
-               cv2.imshow("Imagen Binaria", img_mask )
+               cv2.imshow("Imagen Binaria ", img_mask )
                cv2.imshow("Solucion", img_xor )
         if cv2.waitKey(100) & 0xFF == 27:
                 break
