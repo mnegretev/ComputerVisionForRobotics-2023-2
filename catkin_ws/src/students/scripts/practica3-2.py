@@ -73,14 +73,14 @@ if __name__ == '__main__':
     Max=50
     num_thetas=180
     t_count=50
-    image = cv2.imread("cua.jpg")
+    image = cv2.imread("TestLines.png")
     image=cv2.resize(image,(256,256))
     cv2.imshow('image1',image)
     cv2.waitKey(0)
     edge_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     edge_image = cv2.GaussianBlur(edge_image, (3, 3), 1)
     edge_image = cv2.Canny(edge_image, 100, 200)
-    cv2.namedWindow('Th') 
+    cv2.namedWindow('TH') 
     cv2.createTrackbar('UMBRAL','TH',30, 200, trackbar_callback)
     line(image,edge_image,num_thetas)
     punto1=(x1,y1)
