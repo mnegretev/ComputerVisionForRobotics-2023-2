@@ -1,0 +1,134 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Feb 21 10:18:16 2023
+
+@author: root
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Feb 16 16:37:35 2023
+
+@author: cv
+"""
+
+
+import numpy as np
+import cv2 as cv
+
+
+def mouse_callback(event,x,y,flags,param):
+    global  start_point,end_point,C1,C2,C3,C4,img_roi,frame,frame2,retam,mask
+    global meanb,meang,meanr,upp,low,ret
+    #if event==cv.EVENT_MOUSEMOVE:,C1 
+    
+    if event == cv.EVENT_LBUTTONDOWN:
+        start_point=(x, y)
+        C1=start_point[0]
+        C2=start_point[1]
+        print( start_point)
+    
+    if event == cv.EVENT_LBUTTONUP:
+        end_point=(x, y)
+        #cv.rectangle(img = frame2,pt1 = start_point,pt2 = (x,y), color = color, thickness = thickness)
+        print(end_point)
+        C3=end_point[0]
+        C4=end_point[1]
+        img_roi=frame1[C2:C4, C1:C3]  
+        mean2 = cv.mean(img_roi) #promedio de una dimension
+        print(mean2)
+        b,g,r= cv.split(img_roi)
+        meanb = cv.mean(b)[0] 
+        meang = cv.mean(g)[0] 
+        meanr = cv.mean(r)[0] 
+        umbrales(circle_radius)
+  
+def trackbar_callback(val):
+    global circle_radius
+    circle_radius = val 
+    
+    
+    
+def umbrales (circle_radius):
+    global  umbralb,umbralg,umbralr,Numbralb,Numbralg, Numbralr,mask,low,upp
+    global  img_and, imagenRGB,meanb,meang,meanr
+    umbralb= meanb+circle_radius
+    umbralg= meang+circle_radius
+    umbralr= meanr+circle_radius   
+
+    Numbralb= meanb-circle_radius
+    Numbralg= meang-circle_radius
+    Numbralr= meanr-circle_radius   
+
+    low=np.array([umbralb,umbralg,umbralr],np.uint8)
+    upp=np.array([Numbralb,Numbralg,Numbralr],np.uint8)
+
+      
+    
+def main():
+    global thickness, color,mean,mean2,circle_radius,low,upp,mask,img_roi,ret
+    global  img_and, img_fondo,frame1,frame2,cap,final,retam,meanb,meang,meanr
+    global start_point,end_point
+    upp =0
+    low=0
+    start_point=(0,0)
+    end_point=(0,0)
+    img_fondo= cv.imread('cielo.jpeg')
+    color = (0, 0, 255)
+    thickness = 3
+    circle_radius = 10
+    tama1= 256
+    tama2= 256
+    dim= (tama1,tama2)
+    retam=cv.resize(img_fondo,dim)
+    cv.namedWindow('My Video')
+    cv.namedWindow('rectangulo') 
+    #cv.namedWindow('rectan') 
+    cv.setMouseCallback('My Video', mouse_callback)
+    cv.createTrackbar('r','My Video',circle_radius, 100, trackbar_callback)
+    
+    cap  = cv.VideoCapture(0)
+    while cap.isOpened():
+        ret, frame1 = cap.read()
+        frame1=cv.resize(frame1,(256,256))
+        frame2= frame1.copy()
+     
+        if not ret:
+            print("Can't receive frame (stream end?). Exiting ...")
+            break
+         
+        cv.imshow('My Video', frame1)
+        #cv.imshow('rectan', frame2)
+        cv.rectangle(img = frame2,pt1 = start_point,pt2 = end_point, color = color, thickness = thickness)
+        cv.imshow("rectangulo", frame2)
+        mask=cv.inRange(frame1,upp,low)
+        mask=mask.astype(np.uint8)
+        maskinv=cv.bitwise_not(mask)
+        img_and = cv.bitwise_and( frame1,frame1, mask=maskinv)
+        fondoinv=cv.bitwise_and( retam,retam, mask=mask)
+        final=cv.add(fondoinv,img_and)
+        cv.namedWindow('fondoinvertido') #nombra la ventana 
+        cv.imshow("fondoinvertido", final)
+        
+
+        if cv.waitKey(10) & 0xFF == 27:
+            break
+    cap.release()
+    cv.destroyAllWindows()
+
+    
+
+if __name__ == '__main__':
+    main()
+    cap  = cv.VideoCapture(0)
+    while cap.isOpened():
+        ret, frame1 = cap.read()
+        frame1=cv.resize(frame1,(512,512))
+        frame2= frame1.copy()
+     
+        if not ret:
+            print("Can't receive frame (stream end?). Exiting ...")
+            break           
+    cap.release()
